@@ -93,3 +93,29 @@ def get_water_fugacity_coefficient(pressure, temperature):
     test_ops.TPflash()
 
     return (get_gas_fug_coef(fluid1))
+
+
+def get_co2_parameters(pressure, temperature):
+
+    temperature = temperature + 273.15
+    fluid1 = jNeqSim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325) ## CPA model
+    fluid1.setTemperature(temperature, 'K')
+    fluid1.setPressure(pressure, 'bara')
+    fluid1.addComponent('CO2', 1.0)
+    fluid1.setMixingRule(9)
+    fluid1.setMultiPhaseCheck(True)
+
+    components_list = get_component_list(fluid1)
+    test_ops = jNeqSim.thermodynamicOperations.ThermodynamicOperations(fluid1)
+    test_ops.TPflash()
+
+    fluid1.initPhysicalProperties()
+
+    results = {
+        "density":fluid1.getDensity("kg/m3"),
+        "speed_of_sound":fluid1.getSoundSpeed("m/s"),
+        "enthalpy":fluid1.getEnthalpy("kJ/kg"),
+        "entropy":fluid1.getEntropy("J/K")
+    }
+
+    return results
