@@ -241,7 +241,12 @@ class Fluid:
 
     def calc_Rachford_Rice(self, betta):
         f = 0
-
+        for k in range(len(self.K_values)):
+            if self.K_values[k] > 1e50:
+                self.K_values[k] = 1e50
+            elif self.K_values[k] < 1e-50:
+                self.K_values[k] = 1e-50
+                
         for i, component in enumerate(self.components):
             f += self.fractions[i]*(self.K_values[i]-1)/(1-betta+betta*self.K_values[i])
         return f
@@ -371,6 +376,7 @@ class Fluid:
             self.calc_phases()
             for i in range(len(self.phases)):
                     self.phases[i].set_phase_flow_rate(self.flow_rate)
+
             self.get_phase(1).fractions[0] = 1e-50
             self.get_phase(1).normalize()
             self.calc_fugacity_neqsim_CPA(self.phases[0].fractions)
@@ -395,6 +401,7 @@ class Fluid:
                 self.get_phase(1).normalize()
                 self.calc_fugacity_neqsim_CPA(self.phases[0].fractions)
                 self.calc_activity()
+                self.phases[1].set_phase_flow_rate(self.flow_rate)
 
                 break
                 
