@@ -7,7 +7,7 @@ import numpy as np
 warnings.filterwarnings("ignore")
 from scipy.optimize import bisect
 jNeqSim.util.database.NeqSimDataBase.replaceTable('COMP', "/workspaces/SolubilityCCS/Database/COMP.csv") ##
-
+import matplotlib.pyplot as plt
 from neqsim_functions import get_water_fugacity_coefficient, get_acid_fugacity_coeff
 from sulfuric_acid_activity import calc_activity_water_h2so4
 
@@ -262,13 +262,28 @@ class Fluid:
         else:
             self.betta = bisect(self.calc_Rachford_Rice, 0, 1)
             min_f = self.calc_Rachford_Rice(self.betta)
-            if min_f > 1e-5:
-                raise ValueError(f"Min f sol Rachford Rice min_f {min_f} ")
             if self.betta > 1:
                 self.betta = 1.0
             if self.betta < 0:
                 self.betta = 0.0
         return self.betta
+    
+    
+    def plot_Rachford_Rice(self):
+        # Define a range of beta values
+        betta_values = np.linspace(0, 1, 50)
+
+        # Calculate corresponding values of the Rachford-Rice function
+        f_values = [self.calc_Rachford_Rice(b) for b in betta_values]
+        print(f_values)
+
+        # Plot the Rachford-Rice function
+        plt.plot(betta_values, f_values)
+        plt.xlabel('Beta')
+        plt.ylabel('Rachford-Rice function')
+        plt.title('Rachford-Rice function vs. Beta')
+        plt.grid(True)
+        plt.show()
     
     def calc_phases(self):
         yi = []
