@@ -7,7 +7,7 @@
 			"version": "11"
 		}
 	},
-	"postCreateCommand": "./devcontainer/install-requirements.sh",
+	"postCreateCommand": "bash .devcontainer/install-requirements.sh",
     "customizations": {
         "vscode": {
             "settings": {
