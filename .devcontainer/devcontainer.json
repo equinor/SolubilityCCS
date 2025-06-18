@@ -7,5 +7,16 @@
 		"ghcr.io/devcontainers/features/java": {
 			"version": "11"
 		}
-	}
+	},
+	"postCreateCommand": "./devcontainer/install-requirements.sh",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/workspaces/SolubilityCCS/venv/bin/python"
+            },
+			 "extensions": [
+                "ms-toolsai.jupyter"
+            ]
+        }
+    }
 }
