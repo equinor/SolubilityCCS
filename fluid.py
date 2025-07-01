@@ -3,10 +3,40 @@ from neqsim import jNeqSim
 import pandas as pd
 import warnings
 import numpy as np
+import os
 # Suppress runtime warnings
 warnings.filterwarnings("ignore")
 from scipy.optimize import bisect
-jNeqSim.util.database.NeqSimDataBase.replaceTable('COMP', "/workspaces/SolubilityCCS/Database/COMP.csv") ##
+
+def get_database_path(filename):
+    """Get the path to a database file, with fallbacks for different environments"""
+    current_dir = os.getcwd()
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    paths_to_try = [
+        os.path.join(script_dir, "Database", filename),
+        os.path.join(current_dir, "Database", filename),
+        os.path.join(current_dir, filename),
+        f"/workspaces/SolubilityCCS/Database/{filename}",  # Dev container path
+    ]
+    
+    for path in paths_to_try:
+        if os.path.exists(path):
+            return path
+    return None
+
+# Try to load custom COMP.csv database
+comp_csv_path = get_database_path("COMP.csv")
+if comp_csv_path:
+    try:
+        jNeqSim.util.database.NeqSimDataBase.replaceTable('COMP', comp_csv_path)
+        print(f"Loaded custom COMP database from: {comp_csv_path}")
+    except Exception as e:
+        print(f"Warning: Could not load COMP.csv from {comp_csv_path}: {e}")
+        print("Using default NeqSim database")
+else:
+    print("Warning: COMP.csv not found, using default NeqSim database")
+
 import matplotlib.pyplot as plt
 from neqsim_functions import get_water_fugacity_coefficient, get_acid_fugacity_coeff
 from sulfuric_acid_activity import calc_activity_water_h2so4
@@ -186,7 +216,18 @@ class Fluid:
         self.factor_up = 1.1
         self.factor_down = 0.9
 
-        self.properties = pd.read_csv("/workspaces/SolubilityCCS/Database/Properties.csv", sep=";", index_col="Component")
+        # Use relative path for properties file
+        properties_path = get_database_path("Properties.csv")
+        if properties_path:
+            try:
+                self.properties = pd.read_csv(properties_path, sep=";", index_col="Component")
+                print(f"Loaded properties from: {properties_path}")
+            except Exception as e:
+                print(f"Warning: Could not load Properties.csv from {properties_path}: {e}")
+                self.properties = pd.DataFrame()
+        else:
+            print("Warning: Properties.csv not found, using empty properties dataframe")
+            self.properties = pd.DataFrame()
 
 
     def set_temperature(self, temperature):

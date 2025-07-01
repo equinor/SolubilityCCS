@@ -1,0 +1,11 @@
+neqsim==2.5.29
+scipy
+ipykernel
+matplotlib
+pandas
+numpy
+pytest
+pytest-cov
+pytest-mock
+jupyter
+notebook

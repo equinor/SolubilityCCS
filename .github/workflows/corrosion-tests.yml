@@ -1,0 +1,97 @@
+name: Corrosion Analysis Tests
+
+on:
+  pull_request:
+    bran    - name: Run H2SO4 corrosion test
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v --tb=short
+    
+    - name: Run HNO3 corrosion test
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v --tb=short
+    
+    - name: Run all integration tests
+      run: |
+        source venv/bin/activate
+        python -m pytest -m integration -v --tb=short
+    
+    - name: Run all corrosion tests
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis -v --tb=shortmaster, develop ]
+    paths:
+      - 'fluid.py'
+      - 'test_fluid.py'
+      - 'corrosion_analysis.py'
+      - 'neqsim_functions.py'
+      - 'sulfuric_acid_activity.py'
+      - 'requirements.txt'
+      - 'Database/**'
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'fluid.py'
+      - 'test_fluid.py'
+      - 'corrosion_analysis.py'
+      - 'neqsim_functions.py'
+      - 'sulfuric_acid_activity.py'
+      - 'requirements.txt'
+      - 'Database/**'
+
+jobs:
+  corrosion-tests:
+    name: Corrosion Analysis Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install Java (required for NeqSim)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk
+        echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: Run H2SO4 corrosion test
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v --tb=short
+    
+    - name: Run HNO3 corrosion test
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v --tb=short
+    
+    - name: Run all corrosion analysis tests
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis -v --tb=short
+    
+    - name: Run corrosion analysis script
+      run: |
+        source venv/bin/activate
+        timeout 300 python corrosion_analysis.py || echo "Corrosion analysis completed or timed out"

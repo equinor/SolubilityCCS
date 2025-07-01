@@ -1,5 +1,34 @@
 from neqsim import jNeqSim
-jNeqSim.util.database.NeqSimDataBase.replaceTable('COMP', "/workspaces/SolubilityCCS/Database/COMP.csv") ##
+import os
+
+def get_database_path(filename):
+    """Get the path to a database file, with fallbacks for different environments"""
+    current_dir = os.getcwd()
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    paths_to_try = [
+        os.path.join(script_dir, "Database", filename),
+        os.path.join(current_dir, "Database", filename),
+        os.path.join(current_dir, filename),
+        f"/workspaces/SolubilityCCS/Database/{filename}",  # Dev container path
+    ]
+    
+    for path in paths_to_try:
+        if os.path.exists(path):
+            return path
+    return None
+
+# Try to load custom COMP.csv database
+comp_csv_path = get_database_path("COMP.csv")
+if comp_csv_path:
+    try:
+        jNeqSim.util.database.NeqSimDataBase.replaceTable('COMP', comp_csv_path)
+        print(f"NeqSim functions: Loaded custom COMP database from: {comp_csv_path}")
+    except Exception as e:
+        print(f"NeqSim functions: Warning - Could not load COMP.csv from {comp_csv_path}: {e}")
+        print("NeqSim functions: Using default NeqSim database")
+else:
+    print("NeqSim functions: Warning - COMP.csv not found, using default NeqSim database")
 
 def get_component_list(fluid):
     """
