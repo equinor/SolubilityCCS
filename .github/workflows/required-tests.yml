@@ -1,0 +1,55 @@
+name: Required Tests
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+
+jobs:
+  required-corrosion-tests:
+    name: Required Corrosion Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install Java for NeqSim
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk
+        echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+    
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    
+    - name: Test H2SO4 Corrosion Analysis (Required)
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v
+    
+    - name: Test HNO3 Corrosion Analysis (Required)
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v
+    
+    - name: Validate Fluid Class Functionality
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestFluid -v
+    
+    - name: Test CO2 Properties
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCO2Properties -v

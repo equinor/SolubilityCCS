@@ -1,0 +1,95 @@
+name: Corrosion Tests - Simple
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    name: Run Corrosion Analysis Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install Java (required for NeqSim)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+    
+    - name: Create virtual environment and install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: Verify environment and files
+      run: |
+        source venv/bin/activate
+        python --version
+        java -version
+        echo "Current directory: $(pwd)"
+        echo "Files in current directory:"
+        ls -la
+        echo "Database directory contents:"
+        ls -la Database/ || echo "Database directory not found"
+        python -c "import sys; print('Python path:', sys.executable)"
+        python -c "import neqsim; print('NeqSim imported successfully')"
+        python -c "import os; print('Script directory:', os.path.dirname(os.path.abspath('fluid.py')))"
+    
+    - name: Run basic tests (no database required)
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestFluidWithoutDatabase -v --tb=short
+        python -c "from fluid import Fluid; f = Fluid(); print('Fluid class works without database')"
+    
+    - name: Run integration tests (if database available)
+      run: |
+        source venv/bin/activate
+        # Run integration tests specifically marked with @pytest.mark.integration
+        python -m pytest -m integration -v --tb=short
+      continue-on-error: true
+    
+    - name: Run non-integration tests (always)
+      run: |
+        source venv/bin/activate
+        # Run tests that are NOT marked as integration
+        python -m pytest -m "not integration" -v --tb=short
+    
+    - name: Check if database files exist
+      run: |
+        echo "Checking for database files..."
+        if [ -f "Database/COMP.csv" ]; then
+          echo "✓ COMP.csv found"
+        else
+          echo "✗ COMP.csv not found"
+        fi
+        if [ -f "Database/Properties.csv" ]; then
+          echo "✓ Properties.csv found"
+        else
+          echo "✗ Properties.csv not found"
+        fi
+    
+    - name: Run H2SO4 corrosion test (if database available)
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v --tb=short
+      continue-on-error: true
+    
+    - name: Run HNO3 corrosion test (if database available)
+      run: |
+        source venv/bin/activate
+        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v --tb=short
+      continue-on-error: true

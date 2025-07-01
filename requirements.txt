@@ -1,4 +1,12 @@
-pip install neqsim==2.5.29
-pip install scipy
-pip install ipykernel
-pip install matplotlib
+
+neqsim==2.5.29
+scipy
+ipykernel
+matplotlib
+pandas
+numpy
+pytest
+pytest-cov
+pytest-mock
+jupyter
+notebook

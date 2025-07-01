@@ -1,0 +1,51 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run All Tests",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": [
+				"-m",
+				"pytest",
+				"-v"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Tests with Coverage",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": [
+				"-m", "pytest", 
+				"--cov=.", 
+				"--cov-report=html", 
+				"--cov-report=term-missing",
+				"-v"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Quick Tests",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": ["-m", "pytest", "-v", "--tb=short"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Corrosion Analysis",
+			"type": "shell",
+			"command": "${command:python.interpreterPath}",
+			"args": ["corrosion_analysis.py"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

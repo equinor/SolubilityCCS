@@ -1,0 +1,39 @@
+# CODEOWNERS file for SolubilityCCS repository
+# This file defines who owns and should review changes to specific parts of the codebase
+
+# Global ownership - you own everything by default
+* @Sviatose
+
+# Core fluid simulation files - critical components
+fluid.py @Sviatose
+neqsim_functions.py @Sviatose
+sulfuric_acid_activity.py @Sviatose
+
+# Test files - ensure all tests are properly reviewed
+test_*.py @Sviatose
+*_test.py @Sviatose
+
+# Configuration and workflow files
+.github/ @Sviatose
+pytest.ini @Sviatose
+requirements.txt @Sviatose
+
+# Database files - critical for accurate simulations
+Database/ @Sviatose
+Database/*.csv @Sviatose
+
+# Documentation
+README.md @Sviatose
+TESTING.md @Sviatose
+*.md @Sviatose
+
+# Jupyter notebooks
+*.ipynb @Sviatose
+
+# Analysis scripts
+corrosion_analysis.py @Sviatose
+run_tests.py @Sviatose
+
+# Build and configuration files
+Makefile @Sviatose
+LICENSE @Sviatose
