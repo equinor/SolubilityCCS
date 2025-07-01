@@ -329,6 +329,99 @@ class TestCorrosionAnalysis:
                 assert abs(results["enthalpy"] - (-178.6763331712992)) < 0.01, f"CO2 enthalpy should be ~-178.68 kJ/kg, got {results['enthalpy']}"
                 assert abs(results["entropy"] - (-56.74553450179903)) < 0.01, f"CO2 entropy should be ~-56.75 J/K, got {results['entropy']}"
 
+    @skip_if_no_database
+    @pytest.mark.integration
+    def test_hno3_real_flash_with_tolerance(self):
+        """Test HNO3 corrosion analysis with real flash calculations and 5% tolerance"""
+        # Input parameters matching the example notebook
+        acid = "HNO3"
+        acid_in_co2 = 10000  # ppm
+        water_in_co2 = 200  # ppm
+        temperature = 2  # C
+        pressure = 100  # bara (changed from 60 to match notebook)
+        flow_rate = 10  # Mt/year (changed from 100 to match notebook)
+        
+        # Set up fluid
+        fluid = Fluid()
+        fluid.add_component("CO2", 1.0 - acid_in_co2/1e6 - water_in_co2/1e6)
+        fluid.add_component(acid, acid_in_co2/1e6)
+        fluid.add_component("H2O", water_in_co2/1e6)
+        fluid.set_temperature(temperature + 273.15)  # to Kelvin
+        fluid.set_pressure(pressure)  # bara
+        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
+        
+        # Perform REAL flash calculations (no mocking)
+        fluid.calc_vapour_pressure()
+        fluid.flash_activity()
+        
+        # Expected values from the notebook output
+        expected_betta = 0.9945319254020433
+        expected_water_in_co2_ppm = 0.004466363208091277
+        expected_acid_in_co2_ppm = 8215.479994837924
+        expected_liquid_acid_wt_prc = 96.97116193249323
+        expected_liquid_flow_rate_ty = 72461.14333107453
+        expected_water_in_liquid = 0.09854724145367069
+        expected_acid_in_liquid = 0.9014527585463292
+        expected_co2_density = 864.1859259274647
+        expected_co2_speed_of_sound = 451.4925413361345
+        expected_co2_enthalpy = -179.77874999905623
+        expected_co2_entropy = -57.67928383916211
+        
+        # Test phase behavior with 5% tolerance
+        assert abs(fluid.betta - expected_betta) / expected_betta < 0.05, \
+            f"Gas phase fraction should be within 5% of {expected_betta}, got {fluid.betta}"
+        
+        # Test gas phase concentrations with 5% tolerance
+        water_in_co2_ppm = 1e6 * fluid.phases[0].get_component_fraction("H2O")
+        acid_in_co2_ppm = 1e6 * fluid.phases[0].get_component_fraction(acid)
+        
+        assert abs(water_in_co2_ppm - expected_water_in_co2_ppm) / expected_water_in_co2_ppm < 0.05, \
+            f"Water in CO2 should be within 5% of {expected_water_in_co2_ppm} ppm, got {water_in_co2_ppm}"
+        
+        assert abs(acid_in_co2_ppm - expected_acid_in_co2_ppm) / expected_acid_in_co2_ppm < 0.05, \
+            f"HNO3 in CO2 should be within 5% of {expected_acid_in_co2_ppm} ppm, got {acid_in_co2_ppm}"
+        
+        # Test liquid phase formation
+        assert fluid.betta < 1, "Should have liquid phase formation (betta < 1)"
+        assert len(fluid.phases) > 1, "Should have at least 2 phases"
+        assert fluid.phases[1].name == "ACIDIC", "Second phase should be acidic"
+        
+        # Test liquid phase composition with 5% tolerance
+        liquid_acid_wt_prc = fluid.phases[1].get_acid_wt_prc(acid)
+        assert abs(liquid_acid_wt_prc - expected_liquid_acid_wt_prc) / expected_liquid_acid_wt_prc < 0.05, \
+            f"Liquid acid wt% should be within 5% of {expected_liquid_acid_wt_prc}%, got {liquid_acid_wt_prc}"
+        
+        # Test liquid phase flow rate with 5% tolerance
+        liquid_flow_rate_ty = fluid.phases[1].get_flow_rate("kg/hr") * 24 * 365 / 1000
+        assert abs(liquid_flow_rate_ty - expected_liquid_flow_rate_ty) / expected_liquid_flow_rate_ty < 0.05, \
+            f"Liquid flow rate should be within 5% of {expected_liquid_flow_rate_ty} t/y, got {liquid_flow_rate_ty}"
+        
+        # Test liquid phase component fractions with 5% tolerance
+        water_in_liquid = fluid.phases[1].get_component_fraction("H2O")
+        acid_in_liquid = fluid.phases[1].get_component_fraction(acid)
+        
+        assert abs(water_in_liquid - expected_water_in_liquid) / expected_water_in_liquid < 0.05, \
+            f"Water in liquid should be within 5% of {expected_water_in_liquid}, got {water_in_liquid}"
+        
+        assert abs(acid_in_liquid - expected_acid_in_liquid) / expected_acid_in_liquid < 0.05, \
+            f"Acid in liquid should be within 5% of {expected_acid_in_liquid}, got {acid_in_liquid}"
+        
+        # Test CO2 properties with 5% tolerance (no mocking)
+        results = get_co2_parameters(pressure, temperature)
+        
+        assert abs(results["density"] - expected_co2_density) / expected_co2_density < 0.05, \
+            f"CO2 density should be within 5% of {expected_co2_density} kg/m3, got {results['density']}"
+        
+        assert abs(results["speed_of_sound"] - expected_co2_speed_of_sound) / expected_co2_speed_of_sound < 0.05, \
+            f"CO2 speed of sound should be within 5% of {expected_co2_speed_of_sound} m/s, got {results['speed_of_sound']}"
+        
+        # For enthalpy and entropy, use absolute tolerance since they can be negative
+        assert abs(results["enthalpy"] - expected_co2_enthalpy) < abs(expected_co2_enthalpy * 0.05), \
+            f"CO2 enthalpy should be within 5% of {expected_co2_enthalpy} kJ/kg, got {results['enthalpy']}"
+        
+        assert abs(results["entropy"] - expected_co2_entropy) < abs(expected_co2_entropy * 0.05), \
+            f"CO2 entropy should be within 5% of {expected_co2_entropy} J/K, got {results['entropy']}"
+
 class TestCO2Properties:
     """Test cases for CO2 property calculations"""
     

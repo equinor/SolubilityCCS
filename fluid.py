@@ -17,7 +17,7 @@ def get_database_path(filename):
         os.path.join(script_dir, "Database", filename),
         os.path.join(current_dir, "Database", filename),
         os.path.join(current_dir, filename),
-        f"/workspaces/SolubilityCCS/Database/{filename}",  # Dev container path
+        os.path.join("..", "Database", filename),  # Parent directory
     ]
     
     for path in paths_to_try:
