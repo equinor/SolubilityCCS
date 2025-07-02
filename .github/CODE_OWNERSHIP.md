@@ -23,7 +23,7 @@ When you create a pull request, the following happens automatically:
 
 All pull requests require:
 - ✅ **Code owner approval** - Automatic via CODEOWNERS
-- ✅ **Passing tests** - H2SO4 and HNO3 corrosion analysis tests
+- ✅ **Passing tests** - H2SO4 and HNO3 acid formation analysis tests
 - ✅ **Clean build** - No compilation or lint errors
 
 ### Files Requiring Special Review
@@ -61,4 +61,4 @@ For critical bug fixes or security issues:
 
 ---
 
-Remember: The code owner review requirement helps maintain the high quality and reliability of the corrosion analysis system.
+Remember: The code owner review requirement helps maintain the high quality and reliability of the acid formation analysis system.

@@ -17,21 +17,21 @@ Brief description of the changes made.
 ### Testing
 - [ ] All existing tests pass
 - [ ] New tests have been added for new functionality
-- [ ] H2SO4 corrosion analysis test passes
-- [ ] HNO3 corrosion analysis test passes
+- [ ] H2SO4 acid formation analysis test passes
+- [ ] HNO3 acid formation analysis test passes
 - [ ] Manual testing performed (if applicable)
 
-### Corrosion Analysis Tests
+### Acid Formation Analysis Tests
 The following tests are **required** to pass for all pull requests:
-- `test_h2so4_corrosion_analysis_specific_case`
-- `test_hno3_corrosion_analysis_specific_case`
+- `test_h2so4_acid_formation_analysis_specific_case`
+- `test_hno3_acid_formation_analysis_specific_case`
 
-These tests validate the core functionality of the corrosion analysis system.
+These tests validate the core functionality of the acid formation analysis system.
 
 ### Changes Made
 - [ ] Modified `fluid.py`
 - [ ] Modified `test_fluid.py`
-- [ ] Modified `corrosion_analysis.py`
+- [ ] Modified `acid_formation_analysis.py`
 - [ ] Modified database files
 - [ ] Modified other files (specify):
 

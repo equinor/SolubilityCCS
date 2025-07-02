@@ -180,19 +180,19 @@ git commit -m "your message" --no-verify
 
 ```
 SolubilityCCS/
-├── fluid.py                    # Main fluid modeling classes
-├── neqsim_functions.py        # NeqSim integration functions
-├── corrosion_analysis.py      # Corrosion analysis scripts
-├── sulfuric_acid_activity.py  # Acid activity calculations
-├── test_*.py                  # Test files
-├── *.ipynb                    # Jupyter notebooks
-├── Database/                  # Data files
-├── requirements.txt           # Production dependencies
-├── requirements-dev.txt       # Development dependencies
-├── .pre-commit-config.yaml    # Pre-commit configuration
-├── pyproject.toml            # Tool configurations
-├── Makefile                  # Build and development commands
-└── README.md                 # Project documentation
+├── fluid.py                      # Main fluid modeling classes
+├── neqsim_functions.py          # NeqSim integration functions
+├── acid_formation_analysis.py   # Acid formation analysis scripts
+├── sulfuric_acid_activity.py    # Acid activity calculations
+├── test_*.py                    # Test files
+├── *.ipynb                      # Jupyter notebooks
+├── Database/                    # Data files
+├── requirements.txt             # Production dependencies
+├── requirements-dev.txt         # Development dependencies
+├── .pre-commit-config.yaml      # Pre-commit configuration
+├── pyproject.toml              # Tool configurations
+├── Makefile                    # Build and development commands
+└── README.md                   # Project documentation
 ```
 
 ## Getting Help

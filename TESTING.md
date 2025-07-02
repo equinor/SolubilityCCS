@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the testing strategy and setup for the SolubilityCCS project, which analyzes corrosion potential in CO2 systems containing acids (H2SO4 or HNO3) and water.
+This document describes the testing strategy and setup for the SolubilityCCS project, which analyzes acid formation potential in CO2 systems containing acids (H2SO4 or HNO3) and water.
 
 ## Test Structure
 
@@ -25,16 +25,16 @@ This document describes the testing strategy and setup for the SolubilityCCS pro
   - Property setting
 
 #### 2. Integration Tests
-- **TestCorrosionAnalysis**: Tests for corrosion analysis workflow
+- **TestAcidFormationAnalysis**: Tests for acid formation analysis workflow
   - Phase behavior calculations
-  - Corrosion risk assessment
+  - Acid formation risk assessment
   - Concentration calculations
 
 - **TestCO2Properties**: Tests for CO2 property calculations
   - Density, speed of sound, enthalpy, entropy
 
 - **TestIntegration**: Complete workflow tests
-  - End-to-end corrosion analysis
+  - End-to-end acid formation analysis
 
 ## Running Tests
 
@@ -101,7 +101,7 @@ Access through Command Palette (`Ctrl+Shift+P`) → "Tasks: Run Task":
 - Run All Tests
 - Run Tests with Coverage
 - Run Quick Tests
-- Run Corrosion Analysis
+- Run Acid Formation Analysis
 
 ## Test Configuration
 
