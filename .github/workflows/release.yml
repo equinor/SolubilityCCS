@@ -112,7 +112,7 @@ jobs:
       run: |
         echo "Verifying we're on the correct tag..."
         git describe --tags --exact-match
-        python -c "import setuptools_scm; print('Version:', setuptools_scm.get_version())"
+        echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
 
     - name: Build package
       run: |
