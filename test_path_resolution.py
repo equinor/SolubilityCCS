@@ -9,70 +9,57 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pandas as pd
+import pytest
+
 
 def test_path_resolution():
     """Test that path resolution works correctly"""
-    print("=== Testing Path Resolution ===")
+    from path_utils import get_database_path, get_project_root
 
     # Test 1: From project root
-    print("\n1. Testing from project root:")
-    try:
-        from path_utils import get_database_path, get_project_root
+    root = get_project_root()
+    assert root is not None, "Project root should be found"
+    assert isinstance(root, Path), "Project root should be a Path object"
+    assert root.exists(), "Project root directory should exist"
 
-        root = get_project_root()
-        print(f"   Project root: {root}")
+    comp_path = get_database_path("COMP.csv")
+    assert comp_path is not None, "COMP.csv path should be returned"
+    assert os.path.exists(comp_path), "COMP.csv file should exist"
 
-        comp_path = get_database_path("COMP.csv")
-        print(f"   COMP.csv path: {comp_path}")
+    properties_path = get_database_path("Properties.csv")
+    assert properties_path is not None, "Properties.csv path should be returned"
+    assert os.path.exists(properties_path), "Properties.csv file should exist"
 
-        properties_path = get_database_path("Properties.csv")
-        print(f"   Properties.csv path: {properties_path}")
 
-        print("   ✓ All database files found successfully")
+def test_database_files_readable():
+    """Test that database files can be read by pandas"""
+    from path_utils import get_database_path
 
-    except Exception as e:
-        print(f"   ✗ Error: {e}")
+    # Test reading COMP.csv
+    comp_path = get_database_path("COMP.csv")
+    comp_df = pd.read_csv(comp_path)
+    assert len(comp_df) > 0, "COMP.csv should contain data"
+    assert isinstance(comp_df, pd.DataFrame), "COMP.csv should load as DataFrame"
 
-    # Test 2: Check that files actually exist
-    print("\n2. Verifying files exist:")
-    try:
-        import pandas as pd
-
-        # Test reading COMP.csv
-        comp_df = pd.read_csv(comp_path)
-        print(f"   COMP.csv: {len(comp_df)} rows loaded")
-
-        # Test reading Properties.csv
-        props_df = pd.read_csv(properties_path, sep=";")
-        print(f"   Properties.csv: {len(props_df)} rows loaded")
-
-        print("   ✓ All database files readable")
-
-    except Exception as e:
-        print(f"   ✗ Error reading files: {e}")
+    # Test reading Properties.csv
+    properties_path = get_database_path("Properties.csv")
+    props_df = pd.read_csv(properties_path, sep=";")
+    assert len(props_df) > 0, "Properties.csv should contain data"
+    assert isinstance(props_df, pd.DataFrame), "Properties.csv should load as DataFrame"
 
 
 def test_error_handling():
     """Test error handling when files don't exist"""
-    print("\n=== Testing Error Handling ===")
+    from path_utils import get_database_path
 
     # Test with non-existent file
-    print("\n1. Testing with non-existent file:")
-    try:
-        from path_utils import get_database_path
-
+    with pytest.raises(FileNotFoundError):
         get_database_path("nonexistent.csv")
-        print("   ✗ Should have raised an error!")
-    except FileNotFoundError as e:
-        print(f"   ✓ Correctly raised FileNotFoundError: {str(e)[:100]}...")
-    except Exception as e:
-        print(f"   ? Unexpected error type: {type(e).__name__}: {e}")
 
 
-def test_imports():
+def test_module_imports():
     """Test that all imports work with new path handling"""
-    print("\n=== Testing Module Imports ===")
-
     modules_to_test = [
         "fluid",
         "neqsim_functions",
@@ -81,17 +68,13 @@ def test_imports():
     ]
 
     for module in modules_to_test:
-        try:
-            __import__(module)
-            print(f"   ✓ {module} imported successfully")
-        except Exception as e:
-            print(f"   ✗ {module} failed: {e}")
+        # This will raise ImportError if module cannot be imported
+        imported_module = __import__(module)
+        assert imported_module is not None, f"{module} should be importable"
 
 
 def test_from_different_directory():
     """Test that imports work when running from a different directory"""
-    print("\n=== Testing from Different Directory ===")
-
     # Save current directory
     original_dir = os.getcwd()
 
@@ -99,7 +82,6 @@ def test_from_different_directory():
         # Create a temporary directory and change to it
         with tempfile.TemporaryDirectory() as temp_dir:
             os.chdir(temp_dir)
-            print(f"   Changed to: {temp_dir}")
 
             # Add project directory to Python path
             project_root = str(Path(original_dir))
@@ -107,28 +89,16 @@ def test_from_different_directory():
                 sys.path.insert(0, project_root)
 
             # Try to import and use the modules
-            try:
-                from path_utils import get_database_path
+            from path_utils import get_database_path
 
-                comp_path = get_database_path("COMP.csv")
-                print(f"   ✓ Found COMP.csv from different directory: {comp_path}")
-
-            except Exception as e:
-                print(f"   ✗ Failed to find database from different directory: {e}")
+            comp_path = get_database_path("COMP.csv")
+            assert (
+                comp_path is not None
+            ), "Should find COMP.csv from different directory"
+            assert os.path.exists(
+                comp_path
+            ), "COMP.csv should exist when found from different directory"
 
     finally:
         # Restore original directory
         os.chdir(original_dir)
-
-
-if __name__ == "__main__":
-    print("Path Resolution and Error Handling Test")
-    print("=" * 50)
-
-    test_path_resolution()
-    test_error_handling()
-    test_imports()
-    test_from_different_directory()
-
-    print("\n" + "=" * 50)
-    print("Test completed!")

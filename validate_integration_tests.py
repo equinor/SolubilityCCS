@@ -2,24 +2,17 @@
 """Validation script for acid formation assessment calculations.
 
 This demonstrates that our integration tests are working with real calculations.
+Can be run as a script or as pytest tests.
 """
 
-try:
-    from fluid import Fluid
-    from neqsim_functions import get_co2_parameters
-except ImportError as e:
-    print(f"Import error: {e}")
-    print(
-        "Make sure you are running from the project root directory and "
-        "all dependencies are installed."
-    )
-    exit(1)
+import pytest
+
+from fluid import Fluid
+from neqsim_functions import get_co2_parameters
 
 
-def main():
-    print("=== Acid Formation Assessment Validation ===")
-    print("Running the exact notebook calculations for acid formation assessment...\n")
-
+def validate_acid_formation_calculations():
+    """Core validation logic that can be used by both script and pytest."""
     # Setup exactly as in the notebook
     acid = "H2SO4"
     acid_in_co2 = 10  # ppm
@@ -62,48 +55,51 @@ def main():
         "acid_in_liquid": fluid.phases[1].get_component_fraction(acid),
     }
 
-    print("Phase Behavior Results:")
-    print(
-        f"Gas phase fraction (betta): Expected={expected_values['betta']:.10f}, "
-        f"Actual={actual_values['betta']:.10f}"
-    )
+    return expected_values, actual_values, pressure, temperature
+
+
+def test_phase_behavior_validation():
+    """Test phase behavior calculations with pytest assertions."""
+    expected_values, actual_values, _, _ = validate_acid_formation_calculations()
+    tolerance = 5.0  # percent
+
+    # Test gas phase fraction (betta)
     deviation = (
         abs(actual_values["betta"] - expected_values["betta"])
         / expected_values["betta"]
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"Gas phase fraction deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nWater in CO2: Expected={expected_values['water_in_co2_ppm']:.4f} ppm, "
-        f"Actual={actual_values['water_in_co2_ppm']:.4f} ppm"
-    )
+    # Test water in CO2
     deviation = (
         abs(actual_values["water_in_co2_ppm"] - expected_values["water_in_co2_ppm"])
         / expected_values["water_in_co2_ppm"]
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"Water in CO2 deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nAcid wt% in liquid: Expected={expected_values['acid_wt_prc']:.2f}%, "
-        f"Actual={actual_values['acid_wt_prc']:.2f}%"
-    )
+
+def test_acid_formation_validation():
+    """Test acid formation calculations with pytest assertions."""
+    expected_values, actual_values, _, _ = validate_acid_formation_calculations()
+    tolerance = 5.0  # percent
+
+    # Test acid weight percentage in liquid phase
     deviation = (
         abs(actual_values["acid_wt_prc"] - expected_values["acid_wt_prc"])
         / expected_values["acid_wt_prc"]
         * 100
     )
-    print(
-        f"  Deviation: {deviation:.4f}% "
-        f"({'✓ PASS' if deviation <= 5 else '✗ FAIL'})"
-    )
+    assert (
+        deviation <= tolerance
+    ), f"Acid wt% deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nLiquid flow rate: "
-        f"Expected={expected_values['liquid_flow_rate_ty']:.2f} t/y, "
-        f"Actual={actual_values['liquid_flow_rate_ty']:.2f} t/y"
-    )
+    # Test liquid flow rate
     deviation = (
         abs(
             actual_values["liquid_flow_rate_ty"]
@@ -112,12 +108,16 @@ def main():
         / expected_values["liquid_flow_rate_ty"]
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"Liquid flow rate deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    # CO2 parameters
-    print("\n=== CO2 Parameters ===")
+
+def test_co2_parameters_validation():
+    """Test CO2 parameter calculations with pytest assertions."""
+    _, _, pressure, temperature = validate_acid_formation_calculations()
+
     results = get_co2_parameters(pressure, temperature)
-
     expected_co2 = {
         "density": 823.370580206214,
         "speed_of_sound": 402.01680893006034,
@@ -125,55 +125,65 @@ def main():
         "entropy": -56.74553450179903,
     }
 
-    print(
-        f"Density: Expected={expected_co2['density']:.2f} kg/m3, "
-        f"Actual={results['density']:.2f} kg/m3"
-    )
+    tolerance = 5.0  # percent
+
+    # Test density
     deviation = (
         abs(results["density"] - expected_co2["density"])
         / expected_co2["density"]
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"CO2 density deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nSpeed of sound: Expected={expected_co2['speed_of_sound']:.2f} m/s, "
-        f"Actual={results['speed_of_sound']:.2f} m/s"
-    )
+    # Test speed of sound
     deviation = (
         abs(results["speed_of_sound"] - expected_co2["speed_of_sound"])
         / expected_co2["speed_of_sound"]
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"CO2 speed of sound deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nEnthalpy: Expected={expected_co2['enthalpy']:.2f} kJ/kg, "
-        f"Actual={results['enthalpy']:.2f} kJ/kg"
-    )
+    # Test enthalpy
     deviation = (
         abs(abs(results["enthalpy"]) - abs(expected_co2["enthalpy"]))
         / abs(expected_co2["enthalpy"])
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"CO2 enthalpy deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print(
-        f"\nEntropy: Expected={expected_co2['entropy']:.2f} J/K, "
-        f"Actual={results['entropy']:.2f} J/K"
-    )
+    # Test entropy
     deviation = (
         abs(abs(results["entropy"]) - abs(expected_co2["entropy"]))
         / abs(expected_co2["entropy"])
         * 100
     )
-    print(f"  Deviation: {deviation:.4f}% ({'✓ PASS' if deviation <= 5 else '✗ FAIL'})")
+    assert (
+        deviation <= tolerance
+    ), f"CO2 entropy deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
-    print("\n=== Summary ===")
-    print("All calculations are running with real data (no mocking)")
-    print("Integration tests validate results within 5% tolerance")
-    print("Tests confirm the acid formation assessment workflow is working correctly")
+
+class TestIntegrationValidation:
+    """Test class for integration validation to ensure pytest discovery."""
+
+    def test_integration_acid_formation_phase_behavior(self):
+        """Test phase behavior calculations with pytest assertions."""
+        test_phase_behavior_validation()
+
+    def test_integration_acid_formation_validation(self):
+        """Test acid formation calculations with pytest assertions."""
+        test_acid_formation_validation()
+
+    def test_integration_co2_parameters_validation(self):
+        """Test CO2 parameter calculations with pytest assertions."""
+        test_co2_parameters_validation()
 
 
 if __name__ == "__main__":
-    main()
+    # Run the tests when executed as a script
+    pytest.main([__file__, "-v"])
