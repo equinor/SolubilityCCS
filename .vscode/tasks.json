@@ -19,9 +19,9 @@
 			"type": "shell",
 			"command": "${command:python.interpreterPath}",
 			"args": [
-				"-m", "pytest", 
-				"--cov=.", 
-				"--cov-report=html", 
+				"-m", "pytest",
+				"--cov=.",
+				"--cov-report=html",
 				"--cov-report=term-missing",
 				"-v"
 			],
