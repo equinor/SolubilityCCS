@@ -36,7 +36,7 @@ keywords = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "neqsim>=2.5.29",
+    "neqsim==2.5.29",
     "scipy",
     "matplotlib",
     "pandas",
