@@ -2,6 +2,46 @@
 
 A Python package for analyzing solubility and acid formation behavior in Carbon Capture and Storage (CCS) systems.
 
+## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install solubilityCCS
+```
+
+### From Source
+
+```bash
+git clone <repository-url>
+cd SolubilityCCS
+pip install -e .
+```
+
+## Quick Start
+
+```python
+from solubilityCCS import Fluid
+
+# Create a fluid system
+fluid = Fluid()
+fluid.add_component("CO2", 0.999)
+fluid.add_component("H2SO4", 10e-6)  # 10 ppm
+fluid.add_component("H2O", 10e-6)    # 10 ppm
+
+# Set conditions
+fluid.set_temperature(275.15)  # 2°C
+fluid.set_pressure(60.0)       # 60 bara
+
+# Perform calculations
+fluid.calc_vapour_pressure()
+fluid.flash_activity()
+
+# Analyze results
+print(f"Gas phase fraction: {fluid.betta}")
+print(f"Number of phases: {len(fluid.phases)}")
+```
+
 ## Features
 
 - Fluid property calculations for CO2-acid-water systems

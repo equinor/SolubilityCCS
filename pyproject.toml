@@ -1,3 +1,80 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solubilityCCS"
+dynamic = ["version"]
+description = "A Python package for analyzing solubility and acid formation behavior in Carbon Capture and Storage (CCS) systems"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "SolubilityCCS Contributors"}
+]
+maintainers = [
+    {name = "SolubilityCCS Contributors"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = [
+    "carbon-capture",
+    "ccs",
+    "solubility",
+    "acid-formation",
+    "phase-behavior",
+    "thermodynamics"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "neqsim>=2.5.29",
+    "scipy",
+    "matplotlib",
+    "pandas",
+    "numpy"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "black",
+    "isort",
+    "mypy",
+    "pre-commit"
+]
+notebook = [
+    "ipykernel",
+    "jupyter",
+    "notebook"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/SolubilityCCS"
+Documentation = "https://github.com/your-username/SolubilityCCS#readme"
+Repository = "https://github.com/your-username/SolubilityCCS"
+"Bug Tracker" = "https://github.com/your-username/SolubilityCCS/issues"
+
+[tool.setuptools_scm]
+write_to = "solubilityccs/_version.py"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["solubilityccs*"]
+
+[tool.setuptools.package-data]
+solubilityccs = ["Database/*.csv"]
+
 [tool.black]
 line-length = 88
 target-version = ['py38', 'py39', 'py310', 'py311']
