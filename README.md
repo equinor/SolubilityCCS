@@ -2,6 +2,46 @@
 
 A Python package for analyzing solubility and acid formation behavior in Carbon Capture and Storage (CCS) systems.
 
+## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install solubilityCCS
+```
+
+### From Source
+
+```bash
+git clone <repository-url>
+cd SolubilityCCS
+pip install -e .
+```
+
+## Quick Start
+
+```python
+from solubilityCCS import Fluid
+
+# Create a fluid system
+fluid = Fluid()
+fluid.add_component("CO2", 0.999)
+fluid.add_component("H2SO4", 10e-6)  # 10 ppm
+fluid.add_component("H2O", 10e-6)    # 10 ppm
+
+# Set conditions
+fluid.set_temperature(275.15)  # 2°C
+fluid.set_pressure(60.0)       # 60 bara
+
+# Perform calculations
+fluid.calc_vapour_pressure()
+fluid.flash_activity()
+
+# Analyze results
+print(f"Gas phase fraction: {fluid.betta}")
+print(f"Number of phases: {len(fluid.phases)}")
+```
+
 ## Features
 
 - Fluid property calculations for CO2-acid-water systems
@@ -93,7 +133,7 @@ make clean
 ### Basic Example
 
 ```python
-from fluid import Fluid
+from solubilityccs import Fluid
 
 # Create a fluid with CO2, acid, and water
 fluid = Fluid()
@@ -119,6 +159,16 @@ print(f"Number of phases: {len(fluid.phases)}")
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 **Important**: Pre-commit hooks are required for all contributions. Make sure to run `make setup-pre-commit` after cloning the repository.
+
+## Release Process
+
+This project uses automated releases via GitHub Actions. When you merge a pull request:
+
+- **Patch release** (1.0.0 → 1.0.1): Default for bug fixes
+- **Minor release** (1.0.0 → 1.1.0): Include "feat" or "feature" in PR title
+- **Major release** (1.0.0 → 2.0.0): Include "breaking" or "major" in PR title
+
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for detailed information.
 
 ## License
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # Import path utilities for robust file path handling
-from path_utils import get_database_path
+from .path_utils import get_database_path
 
 # Load water activity data with relative path and error handling
 try:

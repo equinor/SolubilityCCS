@@ -15,7 +15,7 @@ import pytest
 
 def test_path_resolution():
     """Test that path resolution works correctly"""
-    from path_utils import get_database_path, get_project_root
+    from solubilityccs.path_utils import get_database_path, get_project_root
 
     # Test 1: From project root
     root = get_project_root()
@@ -34,7 +34,7 @@ def test_path_resolution():
 
 def test_database_files_readable():
     """Test that database files can be read by pandas"""
-    from path_utils import get_database_path
+    from solubilityccs.path_utils import get_database_path
 
     # Test reading COMP.csv
     comp_path = get_database_path("COMP.csv")
@@ -51,7 +51,7 @@ def test_database_files_readable():
 
 def test_error_handling():
     """Test error handling when files don't exist"""
-    from path_utils import get_database_path
+    from solubilityccs.path_utils import get_database_path
 
     # Test with non-existent file
     with pytest.raises(FileNotFoundError):
@@ -61,10 +61,10 @@ def test_error_handling():
 def test_module_imports():
     """Test that all imports work with new path handling"""
     modules_to_test = [
-        "fluid",
-        "neqsim_functions",
-        "sulfuric_acid_activity",
-        "path_utils",
+        "solubilityccs.fluid",
+        "solubilityccs.neqsim_functions",
+        "solubilityccs.sulfuric_acid_activity",
+        "solubilityccs.path_utils",
     ]
 
     for module in modules_to_test:
@@ -89,7 +89,7 @@ def test_from_different_directory():
                 sys.path.insert(0, project_root)
 
             # Try to import and use the modules
-            from path_utils import get_database_path
+            from solubilityccs.path_utils import get_database_path
 
             comp_path = get_database_path("COMP.csv")
             assert (

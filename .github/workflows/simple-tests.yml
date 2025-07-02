@@ -53,7 +53,7 @@ jobs:
       run: |
         source venv/bin/activate
         python -m pytest test_fluid.py::TestFluidWithoutDatabase -v --tb=short
-        python -c "from fluid import Fluid; f = Fluid(); print('Fluid class works without database')"
+        python -c "from solubilityccs import Fluid; f = Fluid(); print('Fluid class works without database')"
 
     - name: Run integration tests (if database available)
       run: |

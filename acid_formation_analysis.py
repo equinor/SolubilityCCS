@@ -6,8 +6,8 @@ This script analyzes the acid formation potential of CO2 systems containing acid
 formation.
 """
 
-from fluid import Fluid
-from neqsim_functions import get_co2_parameters
+from solubilityccs import Fluid
+from solubilityccs.neqsim_functions import get_co2_parameters
 
 
 def analyze_acid_formation_potential(

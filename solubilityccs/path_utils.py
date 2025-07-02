@@ -41,7 +41,7 @@ def get_project_root():
 
 
 def get_database_path(filename):
-    """Get the absolute path to a database file using relative path resolution.
+    """Get the absolute path to a database file using package resources.
 
     Parameters
     ----------
@@ -59,6 +59,14 @@ def get_database_path(filename):
         If the database file cannot be found
     """
     try:
+        # First try to find the database file relative to this module
+        package_dir = Path(__file__).parent.absolute()
+        database_path = package_dir / "Database" / filename
+
+        if database_path.exists():
+            return str(database_path)
+
+        # Fallback to project root method for development
         project_root = get_project_root()
         database_path = project_root / "Database" / filename
 

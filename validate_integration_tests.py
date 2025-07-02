@@ -7,8 +7,8 @@ Can be run as a script or as pytest tests.
 
 import pytest
 
-from fluid import Fluid
-from neqsim_functions import get_co2_parameters
+from solubilityccs import Fluid
+from solubilityccs.neqsim_functions import get_co2_parameters
 
 
 def validate_acid_formation_calculations():

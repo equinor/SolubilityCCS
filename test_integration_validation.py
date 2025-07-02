@@ -5,8 +5,8 @@ This test file contains pytest-compatible tests that validate the integration
 of acid formation assessment calculations with real data and expected results.
 """
 
-from fluid import Fluid
-from neqsim_functions import get_co2_parameters
+from solubilityccs import Fluid
+from solubilityccs.neqsim_functions import get_co2_parameters
 
 
 class TestIntegrationValidation:

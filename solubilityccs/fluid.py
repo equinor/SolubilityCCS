@@ -8,19 +8,29 @@ import pandas as pd
 from neqsim import jNeqSim
 from scipy.optimize import bisect
 
-from neqsim_functions import get_acid_fugacity_coeff, get_water_fugacity_coefficient
-from path_utils import get_database_path
-from sulfuric_acid_activity import calc_activity_water_h2so4
+from .neqsim_functions import get_acid_fugacity_coeff, get_water_fugacity_coefficient
+from .path_utils import get_database_path
+from .sulfuric_acid_activity import calc_activity_water_h2so4
 
 # Suppress runtime warnings
 warnings.filterwarnings("ignore")
 
-# Set up database with relative path and error handling
-try:
-    comp_database_path = get_database_path("COMP.csv")
-    jNeqSim.util.database.NeqSimDataBase.replaceTable("COMP", comp_database_path)
-except FileNotFoundError as e:
-    raise RuntimeError(f"Failed to initialize COMP database: {str(e)}") from e
+# Global variable to track database initialization
+_database_initialized = False
+
+
+def _initialize_database():
+    """Initialize the neqsim database if not already done."""
+    global _database_initialized
+    if not _database_initialized:
+        try:
+            comp_database_path = get_database_path("COMP.csv")
+            jNeqSim.util.database.NeqSimDataBase.replaceTable(
+                "COMP", comp_database_path
+            )
+            _database_initialized = True
+        except FileNotFoundError as e:
+            raise RuntimeError(f"Failed to initialize COMP database: {str(e)}") from e
 
 
 class Phase:
@@ -140,6 +150,9 @@ class Phase:
 class Fluid:
 
     def __init__(self):
+        # Initialize database when Fluid instance is created
+        _initialize_database()
+
         self.phases = []
         self.components = []
         self.fractions = []
