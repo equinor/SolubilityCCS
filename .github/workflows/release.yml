@@ -90,11 +90,6 @@ jobs:
         sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
         cat pyproject.toml | grep version
 
-    - name: Commit version bump
-      run: |
-        git add pyproject.toml
-        git commit -m "Bump version to ${{ steps.version.outputs.version }}" || echo "No changes to commit"
-
     - name: Create and push tag
       run: |
         git tag ${{ steps.version.outputs.tag }}
@@ -149,6 +144,5 @@ jobs:
       run: |
         python -m twine upload dist/*
 
-    - name: Push version bump to main
-      run: |
-        git push origin HEAD:${{ github.event.pull_request.base.ref }}
+    # Note: We skip pushing version bump back to main due to branch protection rules
+    # The version will be updated in the next release cycle
