@@ -17,22 +17,22 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-    
+
     - name: Install Java (required for NeqSim)
       run: |
         sudo apt-get update
         sudo apt-get install -y openjdk-11-jdk
         echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-    
+
     - name: Install dependencies
       run: |
         python -m venv venv
@@ -40,13 +40,13 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov
-    
+
     - name: Run integration tests only
       run: |
         source venv/bin/activate
         echo "Running integration tests marked with @pytest.mark.integration"
         python -m pytest -m integration -v --tb=short
-    
+
     - name: Run integration tests with coverage
       run: |
         source venv/bin/activate

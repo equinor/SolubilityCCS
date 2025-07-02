@@ -53,7 +53,7 @@ python -m pytest --cov=. --cov-report=html --cov-report=term-missing
 # Run only unit tests
 python -m pytest -m "not integration"
 
-# Run only integration tests  
+# Run only integration tests
 python -m pytest -m integration
 
 # Run quick tests

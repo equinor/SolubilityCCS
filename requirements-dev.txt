@@ -1,0 +1,27 @@
+# Core dependencies
+neqsim==2.5.29
+scipy
+ipykernel
+matplotlib
+pandas
+numpy
+jupyter
+notebook
+
+# Testing dependencies
+pytest
+pytest-cov
+pytest-mock
+
+# Development and code quality dependencies
+pre-commit
+black
+isort
+flake8
+mypy
+bandit
+pydocstyle
+types-requests
+
+# Additional development tools
+nbqa  # For formatting Jupyter notebooks
