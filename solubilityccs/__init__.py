@@ -10,6 +10,19 @@ except ImportError:
     # Fallback for development installations
     __version__ = "0.1.0-dev"
 
+
+# Version utility function
+def get_version():
+    """Get the current version of the SolubilityCCS package.
+
+    Returns
+    -------
+    str
+        The version string (e.g., "0.1.0")
+    """
+    return __version__
+
+
 # Import main modules
 try:
     from .fluid import Fluid, Phase
@@ -28,6 +41,7 @@ try:
         "get_water_fugacity_coefficient",
         "calc_activity_water_h2so4",
         "get_database_path",
+        "get_version",
     ]
 except ImportError as e:
     # Handle import errors gracefully during development
@@ -40,6 +54,11 @@ except ImportError as e:
         from .path_utils import get_database_path
         from .sulfuric_acid_activity import calc_activity_water_h2so4
 
-        __all__ = ["__version__", "get_database_path", "calc_activity_water_h2so4"]
+        __all__ = [
+            "__version__",
+            "get_database_path",
+            "calc_activity_water_h2so4",
+            "get_version",
+        ]
     except ImportError:
-        __all__ = ["__version__"]
+        __all__ = ["__version__", "get_version"]
