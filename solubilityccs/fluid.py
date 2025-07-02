@@ -5,7 +5,7 @@ from typing import Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from neqsim import jNeqSim
+from neqsim import jneqsim
 from scipy.optimize import bisect
 
 from .neqsim_functions import get_acid_fugacity_coeff, get_water_fugacity_coefficient
@@ -25,7 +25,7 @@ def _initialize_database():
     if not _database_initialized:
         try:
             comp_database_path = get_database_path("COMP.csv")
-            jNeqSim.util.database.NeqSimDataBase.replaceTable(
+            jneqsim.util.database.NeqSimDataBase.replaceTable(
                 "COMP", comp_database_path
             )
             _database_initialized = True
