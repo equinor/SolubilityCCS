@@ -85,11 +85,11 @@ jobs:
     - name: Run H2SO4 corrosion test (if database available)
       run: |
         source venv/bin/activate
-        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v --tb=short
+        python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_h2so4_acid_formation_analysis_specific_case -v --tb=short
       continue-on-error: true
 
     - name: Run HNO3 corrosion test (if database available)
       run: |
         source venv/bin/activate
-        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v --tb=short
+        python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_hno3_acid_formation_analysis_specific_case -v --tb=short
       continue-on-error: true

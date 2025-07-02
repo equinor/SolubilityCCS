@@ -109,5 +109,5 @@ jobs:
     - name: Test specific corrosion scenarios
       run: |
         source venv/bin/activate
-        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v
-        python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v
+        python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_h2so4_acid_formation_analysis_specific_case -v
+        python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_hno3_acid_formation_analysis_specific_case -v
