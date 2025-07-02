@@ -1,7 +1,7 @@
 from neqsim import jNeqSim
 
 # Import path utilities for robust file path handling
-from path_utils import get_database_path
+from .path_utils import get_database_path
 
 # Set up database with relative path and error handling
 try:

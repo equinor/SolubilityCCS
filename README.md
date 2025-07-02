@@ -133,7 +133,7 @@ make clean
 ### Basic Example
 
 ```python
-from fluid import Fluid
+from solubilityccs import Fluid
 
 # Create a fluid with CO2, acid, and water
 fluid = Fluid()
@@ -159,6 +159,16 @@ print(f"Number of phases: {len(fluid.phases)}")
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 **Important**: Pre-commit hooks are required for all contributions. Make sure to run `make setup-pre-commit` after cloning the repository.
+
+## Release Process
+
+This project uses automated releases via GitHub Actions. When you merge a pull request:
+
+- **Patch release** (1.0.0 → 1.0.1): Default for bug fixes
+- **Minor release** (1.0.0 → 1.1.0): Include "feat" or "feature" in PR title
+- **Major release** (1.0.0 → 2.0.0): Include "breaking" or "major" in PR title
+
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for detailed information.
 
 ## License
 

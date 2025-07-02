@@ -1,5 +1,5 @@
 # Test configuration for environments without database files
-from path_utils import get_database_path_legacy
+from solubilityccs.path_utils import get_database_path_legacy
 
 
 def get_database_path(filename):

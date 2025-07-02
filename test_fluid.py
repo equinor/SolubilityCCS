@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
-from fluid import Fluid, Phase
-from neqsim_functions import get_co2_parameters
+from solubilityccs import Fluid, Phase
+from solubilityccs.neqsim_functions import get_co2_parameters
 from test_config import get_database_path
 
 # Check if database files are available
@@ -83,8 +83,8 @@ class TestAcidFormationAnalysis:
 
         return fluid, acid
 
-    @patch("fluid.Fluid.calc_vapour_pressure")
-    @patch("fluid.Fluid.flash_activity")
+    @patch("solubilityccs.fluid.Fluid.calc_vapour_pressure")
+    @patch("solubilityccs.fluid.Fluid.flash_activity")
     def test_phase_behavior_calculation(self, mock_flash, mock_calc_vapor):
         """Test phase behavior calculation"""
         fluid, acid = self.setup_test_fluid()
@@ -302,7 +302,8 @@ class TestAcidFormationAnalysis:
             }
 
             with patch(
-                "neqsim_functions.get_co2_parameters", return_value=expected_co2_results
+                "solubilityccs.neqsim_functions.get_co2_parameters",
+                return_value=expected_co2_results,
             ):
                 # Perform calculations
                 fluid.calc_vapour_pressure()
@@ -386,7 +387,8 @@ class TestCO2Properties:
         }
 
         with patch(
-            "neqsim_functions.get_co2_parameters", return_value=expected_results
+            "solubilityccs.neqsim_functions.get_co2_parameters",
+            return_value=expected_results,
         ):
             results = get_co2_parameters(pressure, temperature)
 
