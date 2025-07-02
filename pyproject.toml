@@ -49,7 +49,7 @@ dev = [
     "pytest-cov",
     "pytest-mock",
     "black",
-    "isort",
+    "isort<6.0.0",  # Keep compatible with Python 3.8
     "mypy",
     "pre-commit"
 ]
