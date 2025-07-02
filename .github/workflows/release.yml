@@ -50,17 +50,19 @@ jobs:
         patch=${VERSION_PARTS[2]:-0}
 
         # Check PR labels or title for version bump type
-        pr_title="${{ github.event.pull_request.title }}"
-        pr_body="${{ github.event.pull_request.body }}"
+        # Use environment variables to avoid shell injection issues
+        echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+        echo "PR_BODY<<EOF" >> $GITHUB_ENV
+        echo "${{ github.event.pull_request.body }}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
 
-
-        if echo "$pr_title $pr_body" | grep -qi -E "(breaking|major)"; then
+        # Determine version bump type based on PR title
+        if echo "${{ github.event.pull_request.title }}" | grep -qi -E "(breaking|major)"; then
           new_major=$((major + 1))
           new_minor=0
           new_patch=0
           bump_type="major"
-
-        elif echo "$pr_title $pr_body" | grep -qi -E "(feature|minor|feat)"; then
+        elif echo "${{ github.event.pull_request.title }}" | grep -qi -E "(feature|minor|feat)"; then
           new_major=$major
           new_minor=$((minor + 1))
           new_patch=0
