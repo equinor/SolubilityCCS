@@ -95,11 +95,6 @@ jobs:
         echo "tag=$new_tag" >> $GITHUB_OUTPUT
         echo "bump_type=$bump_type" >> $GITHUB_OUTPUT
 
-    - name: Update version in pyproject.toml
-      run: |
-        sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
-        cat pyproject.toml | grep version
-
     - name: Create and push tag
       run: |
         git tag ${{ steps.version.outputs.tag }}
