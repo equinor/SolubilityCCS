@@ -1,4 +1,4 @@
-from neqsim import jNeqSim
+from neqsim import jneqsim
 
 # Import path utilities for robust file path handling
 from .path_utils import get_database_path
@@ -6,7 +6,7 @@ from .path_utils import get_database_path
 # Set up database with relative path and error handling
 try:
     comp_database_path = get_database_path("COMP.csv")
-    jNeqSim.util.database.NeqSimDataBase.replaceTable("COMP", comp_database_path)
+    jneqsim.util.database.NeqSimDataBase.replaceTable("COMP", comp_database_path)
 except FileNotFoundError as e:
     raise RuntimeError(
         f"Failed to initialize COMP database in neqsim_functions: {str(e)}"
@@ -59,7 +59,7 @@ def get_fugacity(fluid1):
 
 def get_acid_fugacity_coeff(acid, pressure, temperature):
     # CPA model
-    fluid1 = jNeqSim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
+    fluid1 = jneqsim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
     fluid1.setTemperature(temperature, "C")
     fluid1.setPressure(pressure, "bara")
     fluid1.addComponent(acid, 1.0)
@@ -69,7 +69,7 @@ def get_acid_fugacity_coeff(acid, pressure, temperature):
     fluid1.setMultiPhaseCheck(True)
 
     components_list = get_component_list(fluid1)
-    test_ops = jNeqSim.thermodynamicOperations.ThermodynamicOperations(fluid1)
+    test_ops = jneqsim.thermodynamicoperations.ThermodynamicOperations(fluid1)
     test_ops.TPflash()
 
     if acid == "HNO3":
@@ -93,7 +93,7 @@ def get_acid_fugacity_coeff(acid, pressure, temperature):
 def get_water_fugacity_coefficient(pressure, temperature):
     temperature = temperature + 273.15
     # CPA model
-    fluid1 = jNeqSim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
+    fluid1 = jneqsim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
     fluid1.setTemperature(temperature, "K")
     fluid1.setPressure(pressure, "bara")
     fluid1.addComponent("CO2", 110.0)
@@ -102,7 +102,7 @@ def get_water_fugacity_coefficient(pressure, temperature):
     fluid1.setMultiPhaseCheck(True)
 
     components_list = get_component_list(fluid1)
-    test_ops = jNeqSim.thermodynamicOperations.ThermodynamicOperations(fluid1)
+    test_ops = jneqsim.thermodynamicoperations.ThermodynamicOperations(fluid1)
     test_ops.TPflash()
 
     value = -0.28985
@@ -122,14 +122,14 @@ def get_water_fugacity_coefficient(pressure, temperature):
 def get_co2_parameters(pressure, temperature):
     temperature = temperature + 273.15
     # CPA model
-    fluid1 = jNeqSim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
+    fluid1 = jneqsim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
     fluid1.setTemperature(temperature, "K")
     fluid1.setPressure(pressure, "bara")
     fluid1.addComponent("CO2", 1.0)
     fluid1.setMixingRule(9)
     fluid1.setMultiPhaseCheck(True)
 
-    test_ops = jNeqSim.thermodynamicOperations.ThermodynamicOperations(fluid1)
+    test_ops = jneqsim.thermodynamicoperations.ThermodynamicOperations(fluid1)
     test_ops.TPflash()
 
     fluid1.initPhysicalProperties()
