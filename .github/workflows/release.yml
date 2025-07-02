@@ -100,6 +100,10 @@ jobs:
         git tag ${{ steps.version.outputs.tag }}
         git push origin ${{ steps.version.outputs.tag }}
 
+    - name: Checkout tag for clean build
+      run: |
+        git checkout ${{ steps.version.outputs.tag }}
+
     - name: Build package
       run: |
         python -m build
