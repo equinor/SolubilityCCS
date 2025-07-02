@@ -53,11 +53,13 @@ jobs:
         pr_title="${{ github.event.pull_request.title }}"
         pr_body="${{ github.event.pull_request.body }}"
 
+
         if echo "$pr_title $pr_body" | grep -qi -E "(breaking|major)"; then
           new_major=$((major + 1))
           new_minor=0
           new_patch=0
           bump_type="major"
+
         elif echo "$pr_title $pr_body" | grep -qi -E "(feature|minor|feat)"; then
           new_major=$major
           new_minor=$((minor + 1))
@@ -101,10 +103,12 @@ jobs:
         python -m build
 
     - name: Create GitHub Release
+
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.version.outputs.tag }}
         name: Release ${{ steps.version.outputs.tag }}
+
         body: |
           ## Changes in ${{ steps.version.outputs.tag }}
 
@@ -126,6 +130,7 @@ jobs:
           * ${{ github.event.pull_request.title }} by @${{ github.event.pull_request.user.login }}
 
           **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.version.outputs.tag }}...HEAD
+
         files: |
           dist/solubilityccs-${{ steps.version.outputs.version }}-py3-none-any.whl
           dist/solubilityccs-${{ steps.version.outputs.version }}.tar.gz
@@ -133,6 +138,7 @@ jobs:
         prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
     - name: Publish to PyPI
       env:
