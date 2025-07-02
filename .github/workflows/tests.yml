@@ -101,12 +101,12 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Run corrosion analysis integration test
+    - name: Run acid formation analysis integration test
       run: |
         source venv/bin/activate
-        python corrosion_analysis.py
+        python acid_formation_analysis.py
 
-    - name: Test specific corrosion scenarios
+    - name: Test specific acid formation scenarios
       run: |
         source venv/bin/activate
         python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_h2so4_acid_formation_analysis_specific_case -v

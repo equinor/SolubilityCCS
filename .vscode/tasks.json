@@ -39,10 +39,10 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Corrosion Analysis",
+			"label": "Run Acid Formation Analysis",
 			"type": "shell",
 			"command": "${command:python.interpreterPath}",
-			"args": ["corrosion_analysis.py"],
+			"args": ["acid_formation_analysis.py"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []

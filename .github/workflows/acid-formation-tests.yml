@@ -1,4 +1,4 @@
-name: Corrosion Analysis Tests
+name: Acid Formation Analysis Tests
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     paths:
       - 'fluid.py'
       - 'test_fluid.py'
-      - 'corrosion_analysis.py'
+      - 'acid_formation_analysis.py'
       - 'neqsim_functions.py'
       - 'sulfuric_acid_activity.py'
       - 'requirements.txt'
@@ -16,14 +16,14 @@ on:
     paths:
       - 'fluid.py'
       - 'test_fluid.py'
-      - 'corrosion_analysis.py'
+      - 'acid_formation_analysis.py'
       - 'neqsim_functions.py'
       - 'sulfuric_acid_activity.py'
       - 'requirements.txt'
       - 'Database/**'
 jobs:
-  corrosion-tests:
-    name: Corrosion Analysis Tests
+  acid-formation-tests:
+    name: Acid Formation Analysis Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -57,22 +57,22 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov
 
-    - name: Run H2SO4 corrosion test
+    - name: Run H2SO4 acid formation test
       run: |
         source venv/bin/activate
         python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_h2so4_acid_formation_analysis_specific_case -v --tb=short
 
-    - name: Run HNO3 corrosion test
+    - name: Run HNO3 acid formation test
       run: |
         source venv/bin/activate
         python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_hno3_acid_formation_analysis_specific_case -v --tb=short
 
-    - name: Run all corrosion analysis tests
+    - name: Run all acid formation analysis tests
       run: |
         source venv/bin/activate
         python -m pytest test_fluid.py::TestAcidFormationAnalysis -v --tb=short
 
-    - name: Run corrosion analysis script
+    - name: Run acid formation analysis script
       run: |
         source venv/bin/activate
-        timeout 300 python corrosion_analysis.py || echo "Corrosion analysis completed or timed out"
+        timeout 300 python acid_formation_analysis.py || echo "Acid formation analysis completed or timed out"

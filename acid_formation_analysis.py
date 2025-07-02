@@ -1,7 +1,7 @@
 """
-Corrosion Analysis Script for CO2 Systems with Acids.
+Acid Formation Analysis Script for CO2 Systems with Acids.
 
-This script analyzes the corrosion potential of CO2 systems containing acids
+This script analyzes the acid formation potential of CO2 systems containing acids
 (H2SO4 or HNO3) and water by calculating phase behavior and liquid phase
 formation.
 """
@@ -10,7 +10,7 @@ from fluid import Fluid
 from neqsim_functions import get_co2_parameters
 
 
-def analyze_corrosion_potential(
+def analyze_acid_formation_potential(
     acid="H2SO4",
     acid_in_co2=10,
     water_in_co2=10.0,
@@ -19,7 +19,7 @@ def analyze_corrosion_potential(
     flow_rate=100,
 ):
     """
-    Analyze corrosion potential of CO2 system with acid and water.
+    Analyze acid formation potential of CO2 system with acid and water.
 
     Args:
         acid (str): Type of acid - "H2SO4" or "HNO3"
@@ -50,7 +50,7 @@ def analyze_corrosion_potential(
     # Collect results
     results = {
         "gas_phase_fraction": fluid.betta,
-        "corrosion_risk": "HIGH" if fluid.betta < 1 else "LOW",
+        "acid_formation_risk": "HIGH" if fluid.betta < 1 else "LOW",
         "water_in_co2_ppm": 1e6 * fluid.phases[0].get_component_fraction("H2O"),
         "acid_in_co2_ppm": 1e6 * fluid.phases[0].get_component_fraction(acid),
     }
@@ -92,7 +92,7 @@ def print_analysis_results(results, acid):
         f"Mole fraction of gas phase to total phase "
         f"{results['gas_phase_fraction']:.16f} mol/mol"
     )
-    print(f"Corrosion Risk: {results['corrosion_risk']}")
+    print(f"Acid Formation Risk: {results['acid_formation_risk']}")
     print(f"Water in CO2 {results['water_in_co2_ppm']:.12f} ppm mol")
     print(f"{acid} in CO2 {results['acid_in_co2_ppm']:.12e} ppm mol")
 
@@ -128,7 +128,7 @@ def main():
 
     try:
         # Perform analysis
-        results = analyze_corrosion_potential(
+        results = analyze_acid_formation_potential(
             acid=acid,
             acid_in_co2=acid_in_co2,
             water_in_co2=water_in_co2,

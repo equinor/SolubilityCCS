@@ -6,7 +6,7 @@ on:
     paths:
       - 'fluid.py'
       - 'test_fluid.py'
-      - 'corrosion_analysis.py'
+      - 'acid_formation_analysis.py'
       - 'neqsim_functions.py'
       - 'sulfuric_acid_activity.py'
       - 'Database/**'

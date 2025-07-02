@@ -31,7 +31,7 @@ TESTING.md @Sviatose
 *.ipynb @Sviatose
 
 # Analysis scripts
-corrosion_analysis.py @Sviatose
+acid_formation_analysis.py @Sviatose
 run_tests.py @Sviatose
 
 # Build and configuration files

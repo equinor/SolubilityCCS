@@ -1,12 +1,12 @@
 # SolubilityCCS
 
-A Python package for analyzing solubility and corrosion behavior in Carbon Capture and Storage (CCS) systems.
+A Python package for analyzing solubility and acid formation behavior in Carbon Capture and Storage (CCS) systems.
 
 ## Features
 
 - Fluid property calculations for CO2-acid-water systems
 - Phase behavior analysis using NeqSim
-- Corrosion risk assessment
+- Acid formation risk assessment
 - Support for various acids (H2SO4, HNO3, etc.)
 - Comprehensive testing suite
 

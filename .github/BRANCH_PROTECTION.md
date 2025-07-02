@@ -8,7 +8,7 @@ This document describes the recommended branch protection rules for this reposit
 The following checks must pass before merging to main:
 
 1. **Required Tests** - All core functionality tests
-2. **Corrosion Analysis Tests** - Specific H2SO4 and HNO3 tests
+2. **Acid Formation Analysis Tests** - Specific H2SO4 and HNO3 tests
 3. **Tests** - Full test suite (optional, but recommended)
 
 ### Settings to Enable in GitHub
@@ -16,8 +16,8 @@ The following checks must pass before merging to main:
 1. **Require status checks to pass before merging**: ✅
    - Require branches to be up to date before merging: ✅
    - Required status checks:
-     - `Required Corrosion Tests / required-corrosion-tests`
-     - `Corrosion Analysis Tests / corrosion-tests`
+     - `Required Acid Formation Tests / required-acid-formation-tests`
+     - `Acid Formation Analysis Tests / acid-formation-tests`
 
 2. **Require pull request reviews before merging**: ✅ (recommended)
    - Required approving reviews: 1
@@ -57,11 +57,11 @@ To run the required tests locally:
 source venv/bin/activate
 
 # Run specific required tests
-python -m pytest test_fluid.py::TestCorrosionAnalysis::test_h2so4_corrosion_analysis_specific_case -v
-python -m pytest test_fluid.py::TestCorrosionAnalysis::test_hno3_corrosion_analysis_specific_case -v
+python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_h2so4_acid_formation_analysis_specific_case -v
+python -m pytest test_fluid.py::TestAcidFormationAnalysis::test_hno3_acid_formation_analysis_specific_case -v
 
-# Run all corrosion tests
-python -m pytest test_fluid.py::TestCorrosionAnalysis -v
+# Run all acid formation tests
+python -m pytest test_fluid.py::TestAcidFormationAnalysis -v
 
 # Run all tests
 python -m pytest -v
