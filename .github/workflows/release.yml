@@ -101,8 +101,18 @@ jobs:
         git push origin ${{ steps.version.outputs.tag }}
 
     - name: Checkout tag for clean build
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ steps.version.outputs.tag }}
+        fetch-depth: 0
+        fetch-tags: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify clean version
       run: |
-        git checkout ${{ steps.version.outputs.tag }}
+        echo "Verifying we're on the correct tag..."
+        git describe --tags --exact-match
+        python -c "import setuptools_scm; print('Version:', setuptools_scm.get_version())"
 
     - name: Build package
       run: |
