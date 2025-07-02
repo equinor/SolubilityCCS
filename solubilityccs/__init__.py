@@ -11,7 +11,6 @@ except ImportError:
     __version__ = "0.1.0-dev"
 
 
-
 # Version utility function
 def get_version():
     """Get the current version of the SolubilityCCS package.
@@ -55,7 +54,6 @@ except ImportError as e:
         from .path_utils import get_database_path
         from .sulfuric_acid_activity import calc_activity_water_h2so4
 
-
         __all__ = [
             "__version__",
             "get_database_path",
@@ -64,4 +62,3 @@ except ImportError as e:
         ]
     except ImportError:
         __all__ = ["__version__", "get_version"]
-
