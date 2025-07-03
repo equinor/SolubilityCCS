@@ -1,4 +1,4 @@
-.PHONY: test test-verbose test-coverage test-unit test-integration clean install install-dev setup-pre-commit format lint type-check security-check help
+.PHONY: test test-verbose test-coverage test-quick test-unit test-integration clean install install-dev setup-pre-commit format lint type-check security-check help
 
 # Default Python command - try venv first, fallback to system python
 PYTHON := $(shell if [ -f ./venv/bin/python ]; then echo ./venv/bin/python; elif [ -f ./venv/Scripts/python.exe ]; then echo ./venv/Scripts/python.exe; else echo python; fi)
@@ -12,9 +12,10 @@ help:
 	@echo "  lint             - Run linting with flake8"
 	@echo "  type-check       - Run type checking with mypy"
 	@echo "  security-check   - Run security checks with bandit"
-	@echo "  test             - Run all tests"
+	@echo "  test             - Run all tests with coverage (segfault-safe)"
 	@echo "  test-verbose     - Run tests with verbose output"
-	@echo "  test-coverage    - Run tests with coverage report"
+	@echo "  test-coverage    - Run tests with coverage report (segfault-safe)"
+	@echo "  test-quick       - Run quick tests without coverage"
 	@echo "  test-unit        - Run only unit tests"
 	@echo "  test-integration - Run only integration tests"
 	@echo "  clean            - Clean up test artifacts"
@@ -48,13 +49,16 @@ security-check:
 	bandit -r . -f json -o bandit-report.json || bandit -r .
 
 test:
-	$(PYTHON) -m pytest
+	python run_tests.py
 
 test-verbose:
 	$(PYTHON) -m pytest -v
 
 test-coverage:
-	$(PYTHON) -m pytest --cov=. --cov-report=html --cov-report=term-missing
+	python run_tests.py
+
+test-quick:
+	python run_tests.py quick
 
 test-unit:
 	$(PYTHON) -m pytest -m "not integration"

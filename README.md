@@ -262,7 +262,16 @@ make test-coverage
 # Run specific test categories
 pytest test_fluid.py -v
 pytest test_integration_validation.py -v
+
+# Quick tests without coverage (faster)
+python run_tests.py quick
 ```
+
+### Known Issue: Segmentation Fault in CI
+
+You may occasionally see a segmentation fault (exit code 139) in CI after all tests pass successfully. This is a known issue that occurs during Python interpreter shutdown when using coverage reporting with certain C extensions (like NeqSim). The tests themselves pass correctly, and the segfault happens during cleanup.
+
+**Workaround**: The CI workflows are configured to treat this as a success if the coverage report was generated successfully.
 
 ## API Reference
 
