@@ -1,3 +1,4 @@
+import atexit
 import math
 import warnings
 from typing import Dict, List
@@ -17,6 +18,22 @@ warnings.filterwarnings("ignore")
 
 # Global variable to track database initialization
 _database_initialized = False
+
+
+def _cleanup_jpype():
+    """Clean up JPype resources to prevent segmentation faults."""
+    try:
+        import jpype
+
+        if jpype.isJVMStarted():
+            jpype.shutdownJVM()
+    except (ImportError, Exception):
+        # If JPype is not available or shutdown fails, just continue
+        pass
+
+
+# Register cleanup function to run at exit
+atexit.register(_cleanup_jpype)
 
 
 def _initialize_database():
@@ -505,3 +522,211 @@ class Fluid:
 
     def get_phase(self, i):
         return self.phases[i]
+
+
+class ModelResults:
+    """Class to format and display modeling results as a clean table string."""
+
+    def __init__(self, fluid, co2_properties=None):
+        """Initialize with fluid object and optional CO2 properties.
+
+        Parameters
+        ----------
+        fluid : Fluid
+            The fluid object after flash calculations
+        co2_properties : dict, optional
+            Dictionary with CO2 properties from get_co2_parameters
+        """
+        self.fluid = fluid
+        self.co2_properties = co2_properties or {}
+
+    def generate_table(self, include_co2_props=True, include_liquid_details=True):
+        """Generate a beautifully formatted table string with results.
+
+        Parameters
+        ----------
+        include_co2_props : bool, default True
+            Include pure CO2 properties in the table
+        include_liquid_details : bool, default True
+            Include detailed liquid phase information if present
+
+        Returns
+        -------
+        str
+            Formatted table string
+        """
+        lines = []
+
+        # Header with decorative border
+        lines.append("═" * 65)
+        lines.append("                 SOLUBILITY CCS ANALYSIS RESULTS")
+        lines.append("═" * 65)
+
+        # Get acid component name
+        acid_components = [
+            comp
+            for comp in ["H2SO4", "HNO3"]
+            if any(comp in str(c) for c in self.fluid.components)
+        ]
+        acid = acid_components[0] if acid_components else "Unknown"
+
+        # System Overview Section
+        lines.append("")
+        lines.append("📋 SYSTEM OVERVIEW")
+        lines.append("─" * 35)
+        lines.append(f"Acid Type:            {acid}")
+        lines.append(f"Temperature:          {self.fluid.temperature - 273.15:.1f} °C")
+        lines.append(f"Pressure:             {self.fluid.pressure:.1f} bara")
+
+        # Phase Behavior Assessment
+        lines.append("")
+        lines.append("⚗️  PHASE BEHAVIOR ASSESSMENT")
+        lines.append("─" * 35)
+
+        if self.fluid.betta < 1.0:
+            lines.append("🚨 STATUS: ACID FORMATION RISK DETECTED!")
+            lines.append("⚠️  RISK LEVEL: Two-phase system present")
+        else:
+            lines.append("✅ STATUS: Single gas phase - No acid formation risk")
+            lines.append("🟢 RISK LEVEL: Safe operation")
+
+        # Gas Phase Composition
+        lines.append("")
+        lines.append("GAS PHASE COMPOSITION")
+        lines.append("─" * 35)
+
+        if len(self.fluid.phases) > 0:
+            h2o_ppm = 1e6 * self.fluid.phases[0].get_component_fraction("H2O")
+            acid_ppm = 1e6 * self.fluid.phases[0].get_component_fraction(acid)
+
+            lines.append(f"Water in CO₂:         {h2o_ppm:.2f} ppm (mol)")
+            lines.append(f"{acid} in CO₂:        {acid_ppm:.2f} ppm (mol)")
+
+        # Liquid Phase Details (if present)
+        if (
+            self.fluid.betta < 1.0
+            and len(self.fluid.phases) > 1
+            and include_liquid_details
+        ):
+            lines.append("")
+            lines.append("LIQUID PHASE DETAILS")
+            lines.append("─" * 35)
+
+            liquid_phase = self.fluid.phases[1]
+            lines.append(f"Phase Type:           {liquid_phase.name}")
+            lines.append(
+                f"Acid Concentration:   {liquid_phase.get_acid_wt_prc(acid):.3f} wt%"
+            )
+
+            # Flow rate calculations (if available)
+            try:
+                flow_rate_ty = liquid_phase.get_flow_rate("kg/hr") * 24 * 365 / 1000
+                lines.append(f"Liquid Flow Rate:     {flow_rate_ty:.6f} t/year")
+            except (ValueError, AttributeError):
+                lines.append("Liquid Flow Rate:     Not available")
+
+            h2o_mol_frac = liquid_phase.get_component_fraction("H2O")
+            acid_mol_frac = liquid_phase.get_component_fraction(acid)
+
+            lines.append(f"Water Mol Fraction: {h2o_mol_frac:.6f}")
+            lines.append(f"{acid} Mol Fraction: {acid_mol_frac:.6f}")
+
+        # Pure CO2 Properties
+        if include_co2_props and self.co2_properties:
+            lines.append("")
+            lines.append("PURE CO₂ PROPERTIES")
+            lines.append("─" * 35)
+
+            lines.append(
+                f"Density:              "
+                f"{self.co2_properties.get('density', 'N/A')} kg/m³"
+            )
+            lines.append(
+                f"Speed of Sound:       "
+                f"{self.co2_properties.get('speed_of_sound', 'N/A')} m/s"
+            )
+            lines.append(
+                f"Enthalpy:             "
+                f"{self.co2_properties.get('enthalpy', 'N/A')} kJ/kg"
+            )
+            lines.append(
+                f"Entropy:              "
+                f"{self.co2_properties.get('entropy', 'N/A')} J/K"
+            )
+
+        # Footer
+        lines.append("")
+        lines.append("═" * 65)
+        lines.append("              📊 Analysis Complete | SolubilityCCS")
+        lines.append("═" * 65)
+
+        return "\n".join(lines)
+
+    def to_dict(self):
+        """Return results as a dictionary for programmatic access.
+
+        Returns
+        -------
+        dict
+            Dictionary containing all modeling results
+        """
+        # Get acid component name
+        acid_components = [
+            comp
+            for comp in ["H2SO4", "HNO3"]
+            if any(comp in str(c) for c in self.fluid.components)
+        ]
+        acid = acid_components[0] if acid_components else "Unknown"
+
+        results = {
+            "system": {
+                "acid_type": acid,
+                "temperature_C": self.fluid.temperature - 273.15,
+                "pressure_bara": self.fluid.pressure,
+                "number_of_phases": len(self.fluid.phases),
+                "gas_phase_fraction": self.fluid.betta,
+                "acid_formation_risk": self.fluid.betta < 1.0,
+            }
+        }
+
+        # Gas phase composition
+        if len(self.fluid.phases) > 0:
+            results["gas_phase"] = {
+                "water_ppm_mol": 1e6
+                * self.fluid.phases[0].get_component_fraction("H2O"),
+                "acid_ppm_mol": 1e6 * self.fluid.phases[0].get_component_fraction(acid),
+            }
+
+        # Liquid phase (if present)
+        if self.fluid.betta < 1.0 and len(self.fluid.phases) > 1:
+            liquid_phase = self.fluid.phases[1]
+            results["liquid_phase"] = {
+                "phase_type": liquid_phase.name,
+                "acid_concentration_wt_pct": liquid_phase.get_acid_wt_prc(acid),
+                "water_mol_fraction": liquid_phase.get_component_fraction("H2O"),
+                "acid_mol_fraction": liquid_phase.get_component_fraction(acid),
+            }
+
+            try:
+                results["liquid_phase"]["flow_rate_t_per_year"] = (
+                    liquid_phase.get_flow_rate("kg/hr") * 24 * 365 / 1000
+                )
+            except (ValueError, AttributeError):
+                results["liquid_phase"]["flow_rate_t_per_year"] = None
+
+        # CO2 properties
+        if self.co2_properties:
+            results["co2_properties"] = self.co2_properties.copy()
+
+        return results
+
+    def __str__(self):
+        """Return the formatted table string."""
+        return self.generate_table()
+
+    def __repr__(self):
+        """Return a representation of the ModelResults object."""
+        return (
+            f"ModelResults(phases={len(self.fluid.phases)}, "
+            f"betta={self.fluid.betta:.4f})"
+        )

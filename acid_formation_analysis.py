@@ -73,7 +73,7 @@ def analyze_acid_formation_potential(
         )
 
     # Get CO2 properties
-    co2_results = get_co2_parameters(pressure, temperature)
+    co2_results = get_co2_parameters(pressure, temperature + 273.15)
     results.update(
         {
             "co2_density": co2_results["density"],
