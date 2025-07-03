@@ -1,3 +1,4 @@
+import atexit
 import math
 import warnings
 from typing import Dict, List
@@ -17,6 +18,22 @@ warnings.filterwarnings("ignore")
 
 # Global variable to track database initialization
 _database_initialized = False
+
+
+def _cleanup_jpype():
+    """Clean up JPype resources to prevent segmentation faults."""
+    try:
+        import jpype
+
+        if jpype.isJVMStarted():
+            jpype.shutdownJVM()
+    except (ImportError, Exception):
+        # If JPype is not available or shutdown fails, just continue
+        pass
+
+
+# Register cleanup function to run at exit
+atexit.register(_cleanup_jpype)
 
 
 def _initialize_database():
