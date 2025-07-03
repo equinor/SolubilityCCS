@@ -25,7 +25,7 @@ def get_version():
 
 # Import main modules
 try:
-    from .fluid import Fluid, Phase
+    from .fluid import Fluid, ModelResults, Phase
     from .neqsim_functions import (
         get_acid_fugacity_coeff,
         get_water_fugacity_coefficient,
@@ -37,6 +37,7 @@ try:
         "__version__",
         "Fluid",
         "Phase",
+        "ModelResults",
         "get_acid_fugacity_coeff",
         "get_water_fugacity_coefficient",
         "calc_activity_water_h2so4",

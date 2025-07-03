@@ -117,7 +117,7 @@ def test_co2_parameters_validation():
     """Test CO2 parameter calculations with pytest assertions."""
     _, _, pressure, temperature = validate_acid_formation_calculations()
 
-    results = get_co2_parameters(pressure, temperature)
+    results = get_co2_parameters(pressure, temperature + 273.15)
     expected_co2 = {
         "density": 823.370580206214,
         "speed_of_sound": 402.01680893006034,

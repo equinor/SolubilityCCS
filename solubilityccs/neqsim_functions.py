@@ -120,8 +120,7 @@ def get_water_fugacity_coefficient(pressure, temperature):
 
 
 def get_co2_parameters(pressure, temperature):
-    temperature = temperature + 273.15
-    # CPA model
+    # CPA model - temperature should be in Kelvin
     fluid1 = jneqsim.thermo.system.SystemSrkCPAstatoil(298.15, 1.01325)
     fluid1.setTemperature(temperature, "K")
     fluid1.setPressure(pressure, "bara")

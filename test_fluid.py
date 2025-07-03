@@ -229,7 +229,7 @@ class TestAcidFormationAnalysis:
             assert hasattr(liquid_phase, "name"), "Liquid phase should have a name"
 
         # Test CO2 properties (real calculation)
-        results = get_co2_parameters(pressure, temperature)
+        results = get_co2_parameters(pressure, temperature + 273.15)
         assert (
             results["density"] > 700
         ), f"CO2 density should be reasonable, got {results['density']}"
@@ -355,7 +355,7 @@ class TestAcidFormationAnalysis:
                 ), f"Acid in liquid should be ~0.9322, got {acid_in_liquid}"
 
                 # Test CO2 properties (same as H2SO4 case)
-                results = get_co2_parameters(pressure, temperature)
+                results = get_co2_parameters(pressure, temperature + 273.15)
                 assert (
                     abs(results["density"] - 823.370580206214) < 0.01
                 ), f"CO2 density should be ~823.37 kg/m3, got {results['density']}"
@@ -390,7 +390,7 @@ class TestCO2Properties:
             "solubilityccs.neqsim_functions.get_co2_parameters",
             return_value=expected_results,
         ):
-            results = get_co2_parameters(pressure, temperature)
+            results = get_co2_parameters(pressure, temperature + 273.15)
 
             assert (
                 results["density"] > 800
@@ -580,7 +580,7 @@ class TestIntegration:
         temperature = 2  # C
 
         # Get CO2 parameters using real calculation
-        results = get_co2_parameters(pressure, temperature)
+        results = get_co2_parameters(pressure, temperature + 273.15)
 
         # Expected values from notebook output
         expected_density = 823.370580206214  # kg/m3
@@ -648,7 +648,7 @@ class TestIntegration:
         fluid.flash_activity()
 
         # Get CO2 parameters
-        results = get_co2_parameters(pressure, temperature)
+        results = get_co2_parameters(pressure, temperature + 273.15)
 
         # Verify the complete workflow produces expected results
         # All assertions with 5% tolerance as requested

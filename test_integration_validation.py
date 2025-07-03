@@ -128,7 +128,7 @@ class TestIntegrationValidation:
         temperature = 2  # C
         pressure = 60  # bara
 
-        results = get_co2_parameters(pressure, temperature)
+        results = get_co2_parameters(pressure, temperature + 273.15)
 
         expected_co2 = {
             "density": 823.370580206214,
@@ -212,7 +212,7 @@ class TestIntegrationValidation:
         assert len(fluid.phases) >= 2, "Fluid should have at least 2 phases"
 
         # Test CO2 parameters
-        co2_results = get_co2_parameters(pressure, temperature)
+        co2_results = get_co2_parameters(pressure, temperature + 273.15)
         assert "density" in co2_results, "CO2 results should include density"
         assert (
             "speed_of_sound" in co2_results
