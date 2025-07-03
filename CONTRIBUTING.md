@@ -6,7 +6,7 @@ Thank you for your interest in contributing to SolubilityCCS! This document prov
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.9 or higher
 - Git
 
 ### Setting Up Your Development Environment
