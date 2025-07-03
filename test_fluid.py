@@ -265,8 +265,9 @@ class TestAcidFormationAnalysis:
         fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
 
         # Mock the calc_vapour_pressure and flash_activity methods
-        with patch.object(fluid, "calc_vapour_pressure"), patch.object(
-            fluid, "flash_activity"
+        with (
+            patch.object(fluid, "calc_vapour_pressure"),
+            patch.object(fluid, "flash_activity"),
         ):
 
             # Mock the expected phase behavior results
