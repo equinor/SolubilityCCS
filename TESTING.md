@@ -139,7 +139,7 @@ Pure CO2 entropy: -56.74553450179903 J/K
 
 ### GitHub Actions
 - Automated testing on push/pull request
-- Multiple Python versions (3.8, 3.9, 3.10, 3.11)
+- Multiple Python versions (3.9, 3.10, 3.11, 3.12)
 - Coverage reporting via Codecov
 
 ## Test Data and Mocking
