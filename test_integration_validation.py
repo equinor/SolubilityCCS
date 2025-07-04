@@ -123,6 +123,127 @@ class TestIntegrationValidation:
             deviation <= tolerance
         ), f"Acid in liquid deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
 
+    def test_hno3_acid_formation_validation(self):
+        """Test HNO3 acid formation calculations against expected notebook results."""
+        # Setup exactly as in the notebook
+        acid = "HNO3"
+        acid_in_co2 = 10000  # ppm
+        water_in_co2 = 100.0  # ppm
+        temperature = 2  # C
+        pressure = 60  # bara
+        flow_rate = 100  # Mt/year
+
+        fluid = Fluid()
+        fluid.add_component("CO2", 1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
+        fluid.add_component(acid, acid_in_co2 / 1e6)
+        fluid.add_component("H2O", water_in_co2 / 1e6)
+        fluid.set_temperature(temperature + 273.15)
+        fluid.set_pressure(pressure)
+        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
+
+        # Perform the actual calculations
+        fluid.calc_vapour_pressure()
+        fluid.flash_activity()
+
+        # Expected values from notebook output
+        expected_values = {
+            "betta": 0.997616825688965,
+            "water_in_co2_ppm": 0.001386136472547347,
+            "acid_in_co2_ppm": 8645.79847980026,
+            "acid_wt_prc": 97.96412271922858,
+            "liquid_flow_rate_ty": 323251.46716282965,
+            "water_in_liquid": 0.06780465586675802,
+            "acid_in_liquid": 0.932195344133242,
+        }
+
+        # Calculate actual values
+        actual_values = {
+            "betta": fluid.betta,
+            "water_in_co2_ppm": 1e6 * fluid.phases[0].get_component_fraction("H2O"),
+            "acid_in_co2_ppm": 1e6 * fluid.phases[0].get_component_fraction(acid),
+            "acid_wt_prc": fluid.phases[1].get_acid_wt_prc(acid),
+            "liquid_flow_rate_ty": (
+                fluid.phases[1].get_flow_rate("kg/hr") * 24 * 365 / 1000
+            ),
+            "water_in_liquid": fluid.phases[1].get_component_fraction("H2O"),
+            "acid_in_liquid": fluid.phases[1].get_component_fraction(acid),
+        }
+
+        # Test phase behavior with 5% tolerance
+        tolerance = 5.0  # percent
+
+        # Test gas phase fraction (betta)
+        deviation = (
+            abs(actual_values["betta"] - expected_values["betta"])
+            / expected_values["betta"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Gas phase fraction deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        # Test water in CO2
+        deviation = (
+            abs(actual_values["water_in_co2_ppm"] - expected_values["water_in_co2_ppm"])
+            / expected_values["water_in_co2_ppm"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Water in CO2 deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        # Test acid in CO2
+        deviation = (
+            abs(actual_values["acid_in_co2_ppm"] - expected_values["acid_in_co2_ppm"])
+            / expected_values["acid_in_co2_ppm"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Acid in CO2 deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        # Test acid weight percentage in liquid phase
+        deviation = (
+            abs(actual_values["acid_wt_prc"] - expected_values["acid_wt_prc"])
+            / expected_values["acid_wt_prc"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Acid wt% deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        # Test liquid flow rate
+        deviation = (
+            abs(
+                actual_values["liquid_flow_rate_ty"]
+                - expected_values["liquid_flow_rate_ty"]
+            )
+            / expected_values["liquid_flow_rate_ty"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Liquid flow rate deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        # Test liquid phase component fractions
+        deviation = (
+            abs(actual_values["water_in_liquid"] - expected_values["water_in_liquid"])
+            / expected_values["water_in_liquid"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Water in liquid deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
+        deviation = (
+            abs(actual_values["acid_in_liquid"] - expected_values["acid_in_liquid"])
+            / expected_values["acid_in_liquid"]
+            * 100
+        )
+        assert (
+            deviation <= tolerance
+        ), f"Acid in liquid deviation {deviation:.4f}% exceeds {tolerance}% tolerance"
+
     def test_co2_parameters_validation(self):
         """Test CO2 parameter calculations against expected results."""
         temperature = 2  # C

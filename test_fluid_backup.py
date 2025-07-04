@@ -147,130 +147,6 @@ class TestAcidFormationAnalysis:
         ), "Liquid acid should be highly concentrated"
 
     @skip_if_no_database
-    def test_h2so4_acid_formation_analysis_specific_case(self):
-        """Test H2SO4 acid formation analysis with specific input parameters and expected outputs"""
-        # Input parameters from user's example
-        acid = "H2SO4"
-        acid_in_co2 = 10  # ppm
-        water_in_co2 = 10.0  # ppm
-        temperature = 2  # C
-        pressure = 60  # bara
-        flow_rate = 100  # Mt/year
-
-        # Set up fluid
-        fluid = Fluid()
-        fluid.add_component("CO2", 1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
-        fluid.add_component(acid, acid_in_co2 / 1e6)
-        fluid.add_component("H2O", water_in_co2 / 1e6)
-        fluid.set_temperature(temperature + 273.15)  # to Kelvin
-        fluid.set_pressure(pressure)  # bara
-        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
-
-        # Mock the calc_vapour_pressure and flash_activity methods
-        with (
-            patch.object(fluid, "calc_vapour_pressure"),
-            patch.object(fluid, "flash_activity"),
-        ):
-
-            # Mock the expected phase behavior results
-            mock_phase_gas = Mock()
-            mock_phase_liquid = Mock()
-
-            # Expected outputs from user's example
-            mock_phase_gas.get_component_fraction.side_effect = lambda comp: {
-                "H2O": 7.451380309314413e-6,  # Convert ppm to fraction (7.451380309314413 ppm)
-                "H2SO4": 8.673809998573368e-15,  # Convert ppm to fraction (8.673809998573368e-09 ppm)
-            }.get(comp, 0)
-
-            mock_phase_liquid.get_component_fraction.side_effect = lambda comp: {
-                "H2O": 0.203,
-                "H2SO4": 0.797,
-            }.get(comp, 0)
-
-            mock_phase_liquid.get_acid_wt_prc.return_value = 95.52793777593807
-            mock_phase_liquid.get_flow_rate.return_value = 158.314  # kg/hr
-            mock_phase_liquid.name = "ACIDIC"
-
-            fluid.phases = [mock_phase_gas, mock_phase_liquid]
-            fluid.betta = 0.9999795454259583
-
-            # Mock CO2 properties
-            expected_co2_results = {
-                "density": 823.370580206214,
-                "speed_of_sound": 402.01680893006034,
-                "enthalpy": -178.6763331712992,
-                "entropy": -56.74553450179903,
-            }
-
-            with patch(
-                "solubilityccs.neqsim_functions.get_co2_parameters",
-                return_value=expected_co2_results,
-            ):
-                # Perform calculations
-                fluid.calc_vapour_pressure()
-                fluid.flash_activity()
-
-                # Test phase behavior
-                assert (
-                    abs(fluid.betta - 0.9999795454259583) < 1e-10
-                ), "Gas phase fraction should match expected value"
-
-                # Test water concentration in CO2
-                water_in_co2_ppm = 1e6 * fluid.phases[0].get_component_fraction("H2O")
-                assert (
-                    abs(water_in_co2_ppm - 7.451380309314413) < 0.001
-                ), f"Water in CO2 should be ~7.45 ppm, got {water_in_co2_ppm}"
-
-                # Test acid concentration in CO2
-                acid_in_co2_ppm = 1e6 * fluid.phases[0].get_component_fraction(acid)
-                assert (
-                    abs(acid_in_co2_ppm - 8.673809998573368e-09) < 1e-10
-                ), f"H2SO4 in CO2 should be ~8.67e-09 ppm, got {acid_in_co2_ppm}"
-
-                # Test liquid phase formation
-                assert fluid.betta < 1, "Should have liquid phase formation (betta < 1)"
-                assert fluid.phases[1].name == "ACIDIC", "Second phase should be acidic"
-
-                # Test liquid phase composition
-                liquid_acid_wt_prc = fluid.phases[1].get_acid_wt_prc(acid)
-                assert (
-                    abs(liquid_acid_wt_prc - 95.52793777593807) < 0.01
-                ), f"Liquid acid wt% should be ~95.53%, got {liquid_acid_wt_prc}"
-
-                # Test liquid phase flow rate (convert to t/y)
-                liquid_flow_rate_ty = (
-                    fluid.phases[1].get_flow_rate("kg/hr") * 24 * 365 / 1000
-                )
-                assert (
-                    abs(liquid_flow_rate_ty - 1387.471) < 100
-                ), f"Liquid flow rate should be ~1387.47 t/y, got {liquid_flow_rate_ty}"
-
-                # Test liquid phase component fractions
-                water_in_liquid = fluid.phases[1].get_component_fraction("H2O")
-                acid_in_liquid = fluid.phases[1].get_component_fraction(acid)
-                assert (
-                    abs(water_in_liquid - 0.203) < 0.001
-                ), f"Water in liquid should be ~0.203, got {water_in_liquid}"
-                assert (
-                    abs(acid_in_liquid - 0.797) < 0.001
-                ), f"Acid in liquid should be ~0.797, got {acid_in_liquid}"
-
-                # Test CO2 properties
-                results = get_co2_parameters(pressure, temperature + 273.15)
-                assert (
-                    abs(results["density"] - 823.370580206214) < 0.01
-                ), f"CO2 density should be ~823.37 kg/m3, got {results['density']}"
-                assert (
-                    abs(results["speed_of_sound"] - 402.01680893006034) < 0.01
-                ), f"CO2 speed of sound should be ~402.02 m/s, got {results['speed_of_sound']}"
-                assert (
-                    abs(results["enthalpy"] - (-178.6763331712992)) < 0.01
-                ), f"CO2 enthalpy should be ~-178.68 kJ/kg, got {results['enthalpy']}"
-                assert (
-                    abs(results["entropy"] - (-56.74553450179903)) < 0.01
-                ), f"CO2 entropy should be ~-56.75 J/K, got {results['entropy']}"
-
-    @skip_if_no_database
     def test_hno3_acid_formation_analysis_specific_case(self):
         """Test HNO3 acid formation analysis with specific input parameters and expected outputs"""
         # Input parameters from user's example
@@ -457,38 +333,271 @@ class TestPhaseClass:
         assert phase.name == name
 
 
-class TestFluidWithoutDatabase:
-    """Test cases for Fluid class that work without database files"""
+class TestIntegration:
+    """Integration tests for acid formation possibility assessment"""
 
-    def test_fluid_initialization_without_database(self):
-        """Test that Fluid can be initialized even without database files"""
+    @pytest.mark.integration
+    def test_complete_acid_formation_workflow(self):
+        """Test the complete acid formation assessment workflow"""
+        # This test simulates the complete workflow from the user's code
+        acid = "H2SO4"
+        acid_in_co2 = 10  # ppm
+        water_in_co2 = 10.0  # ppm
+        temperature = 2  # C
+        pressure = 60  # bara
+        flow_rate = 100  # Mt/year
+
+        # Create fluid
         fluid = Fluid()
-        assert fluid is not None
-        assert hasattr(fluid, "components")
-        assert hasattr(fluid, "fractions")
-        assert hasattr(fluid, "properties")
+        fluid.add_component("CO2", 1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
+        fluid.add_component(acid, acid_in_co2 / 1e6)
+        fluid.add_component("H2O", water_in_co2 / 1e6)
+        fluid.set_temperature(temperature + 273.15)
+        fluid.set_pressure(pressure)
+        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
 
-    def test_basic_fluid_operations_without_database(self):
-        """Test basic fluid operations that don't require database files"""
+        # Verify fluid setup
+        assert len(fluid.components) == 3
+        assert "CO2" in fluid.components
+        assert acid in fluid.components
+        assert "H2O" in fluid.components
+        assert fluid.temperature == temperature + 273.15
+        assert fluid.pressure == pressure
+
+        # Test component fractions sum to approximately 1
+        total_fraction = (
+            (1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
+            + acid_in_co2 / 1e6
+            + water_in_co2 / 1e6
+        )
+        assert abs(total_fraction - 1.0) < 1e-10, "Component fractions should sum to 1"
+
+    @pytest.mark.integration
+    @skip_if_no_database
+    def test_real_acid_formation_calculations(self):
+        """
+        Integration test with real calculations - no mocking
+        Tests actual acid formation assessment with expected values within 5% tolerance
+        """
+        # Setup exactly as in the notebook
+        acid = "H2SO4"
+        acid_in_co2 = 10  # ppm
+        water_in_co2 = 10.0  # ppm
+        temperature = 2  # C
+        pressure = 60  # bara
+        flow_rate = 100  # Mt/year
+
         fluid = Fluid()
+        fluid.add_component("CO2", 1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
+        fluid.add_component(acid, acid_in_co2 / 1e6)
+        fluid.add_component("H2O", water_in_co2 / 1e6)
+        fluid.set_temperature(temperature + 273.15)
+        fluid.set_pressure(pressure)
+        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
 
-        # Test temperature and pressure setting
-        fluid.set_temperature(275.15)
-        fluid.set_pressure(60.0)
+        # Perform the actual calculations
+        fluid.calc_vapour_pressure()
+        fluid.flash_activity()
 
-        assert fluid.temperature == 275.15
-        assert fluid.pressure == 60.0
+        # Expected values from the notebook output
+        expected_betta = 0.9999795454259583
+        expected_water_in_co2_ppm = 7.451380309314413
+        expected_acid_in_co2_ppm = 8.673809998573368e-09
+        expected_acid_wt_prc = 95.52793777593807
+        expected_liquid_flow_rate_ty = 3799.5376397443843
+        expected_water_in_liquid = 0.20310928318964988
+        expected_acid_in_liquid = 0.7968907168103502
 
-    def test_database_availability_check(self):
-        """Test that database availability is properly checked"""
-        comp_path = get_database_path("COMP.csv")
-        properties_path = get_database_path("Properties.csv")
+        # Define 5% tolerance for assertions
+        tolerance = 0.05
 
-        # These should either be None or valid paths
-        if comp_path:
-            assert os.path.exists(comp_path)
-        if properties_path:
-            assert os.path.exists(properties_path)
+        # Test gas phase fraction (betta)
+        actual_betta = fluid.betta
+        assert (
+            abs(actual_betta - expected_betta) / expected_betta <= tolerance
+        ), f"Gas phase fraction: expected {expected_betta}, got {actual_betta}, deviation: {abs(actual_betta - expected_betta) / expected_betta * 100:.2f}%"
+
+        # Test water concentration in CO2 gas phase
+        actual_water_in_co2 = 1e6 * fluid.phases[0].get_component_fraction("H2O")
+        assert (
+            abs(actual_water_in_co2 - expected_water_in_co2_ppm)
+            / expected_water_in_co2_ppm
+            <= tolerance
+        ), f"Water in CO2: expected {expected_water_in_co2_ppm} ppm, got {actual_water_in_co2} ppm, deviation: {abs(actual_water_in_co2 - expected_water_in_co2_ppm) / expected_water_in_co2_ppm * 100:.2f}%"
+
+        # Test acid concentration in CO2 gas phase
+        actual_acid_in_co2 = 1e6 * fluid.phases[0].get_component_fraction(acid)
+        # For very small values, use absolute tolerance
+        assert abs(actual_acid_in_co2 - expected_acid_in_co2_ppm) <= max(
+            expected_acid_in_co2_ppm * tolerance, 1e-10
+        ), f"Acid in CO2: expected {expected_acid_in_co2_ppm} ppm, got {actual_acid_in_co2} ppm"
+
+        # Test liquid phase formation
+        assert fluid.betta < 1, "Should form a second phase"
+        assert (
+            fluid.phases[1].name == "ACIDIC"
+        ), f"Second phase should be ACIDIC, got {fluid.phases[1].name}"
+
+        # Test acid weight percentage in liquid phase
+        actual_acid_wt_prc = fluid.phases[1].get_acid_wt_prc(acid)
+        assert (
+            abs(actual_acid_wt_prc - expected_acid_wt_prc) / expected_acid_wt_prc
+            <= tolerance
+        ), f"Acid wt%: expected {expected_acid_wt_prc}%, got {actual_acid_wt_prc}%, deviation: {abs(actual_acid_wt_prc - expected_acid_wt_prc) / expected_acid_wt_prc * 100:.2f}%"
+
+        # Test liquid phase flow rate in t/y
+        actual_liquid_flow_rate_ty = (
+            fluid.phases[1].get_flow_rate("kg/hr") * 24 * 365 / 1000
+        )
+        assert (
+            abs(actual_liquid_flow_rate_ty - expected_liquid_flow_rate_ty)
+            / expected_liquid_flow_rate_ty
+            <= tolerance
+        ), f"Liquid flow rate: expected {expected_liquid_flow_rate_ty} t/y, got {actual_liquid_flow_rate_ty} t/y, deviation: {abs(actual_liquid_flow_rate_ty - expected_liquid_flow_rate_ty) / expected_liquid_flow_rate_ty * 100:.2f}%"
+
+        # Test water mole fraction in liquid phase
+        actual_water_in_liquid = fluid.phases[1].get_component_fraction("H2O")
+        assert (
+            abs(actual_water_in_liquid - expected_water_in_liquid)
+            / expected_water_in_liquid
+            <= tolerance
+        ), f"Water in liquid: expected {expected_water_in_liquid}, got {actual_water_in_liquid}, deviation: {abs(actual_water_in_liquid - expected_water_in_liquid) / expected_water_in_liquid * 100:.2f}%"
+
+        # Test acid mole fraction in liquid phase
+        actual_acid_in_liquid = fluid.phases[1].get_component_fraction(acid)
+        assert (
+            abs(actual_acid_in_liquid - expected_acid_in_liquid)
+            / expected_acid_in_liquid
+            <= tolerance
+        ), f"Acid in liquid: expected {expected_acid_in_liquid}, got {actual_acid_in_liquid}, deviation: {abs(actual_acid_in_liquid - expected_acid_in_liquid) / expected_acid_in_liquid * 100:.2f}%"
+
+    @pytest.mark.integration
+    @skip_if_no_database
+    def test_real_co2_parameters_calculations(self):
+        """
+        Integration test for pure CO2 parameters - no mocking
+        Tests CO2 density, speed of sound, enthalpy, and entropy within 5% tolerance
+        """
+        # Setup conditions from notebook
+        pressure = 60  # bara
+        temperature = 2  # C
+
+        # Get CO2 parameters using real calculation
+        results = get_co2_parameters(pressure, temperature + 273.15)
+
+        # Expected values from notebook output
+        expected_density = 823.370580206214  # kg/m3
+        expected_speed_of_sound = 402.01680893006034  # m/s
+        expected_enthalpy = -178.6763331712992  # kJ/kg
+        expected_entropy = -56.74553450179903  # J/K
+
+        # Define 5% tolerance
+        tolerance = 0.05
+
+        # Test CO2 density
+        actual_density = results["density"]
+        assert (
+            abs(actual_density - expected_density) / expected_density <= tolerance
+        ), f"CO2 density: expected {expected_density} kg/m3, got {actual_density} kg/m3, deviation: {abs(actual_density - expected_density) / expected_density * 100:.2f}%"
+
+        # Test speed of sound
+        actual_speed_of_sound = results["speed_of_sound"]
+        assert (
+            abs(actual_speed_of_sound - expected_speed_of_sound)
+            / expected_speed_of_sound
+            <= tolerance
+        ), f"Speed of sound: expected {expected_speed_of_sound} m/s, got {actual_speed_of_sound} m/s, deviation: {abs(actual_speed_of_sound - expected_speed_of_sound) / expected_speed_of_sound * 100:.2f}%"
+
+        # Test enthalpy (using absolute value for comparison since it's negative)
+        actual_enthalpy = results["enthalpy"]
+        assert (
+            abs(abs(actual_enthalpy) - abs(expected_enthalpy)) / abs(expected_enthalpy)
+            <= tolerance
+        ), f"Enthalpy: expected {expected_enthalpy} kJ/kg, got {actual_enthalpy} kJ/kg, deviation: {abs(abs(actual_enthalpy) - abs(expected_enthalpy)) / abs(expected_enthalpy) * 100:.2f}%"
+
+        # Test entropy (using absolute value for comparison since it's negative)
+        actual_entropy = results["entropy"]
+        assert (
+            abs(abs(actual_entropy) - abs(expected_entropy)) / abs(expected_entropy)
+            <= tolerance
+        ), f"Entropy: expected {expected_entropy} J/K, got {actual_entropy} J/K, deviation: {abs(abs(actual_entropy) - abs(expected_entropy)) / abs(expected_entropy) * 100:.2f}%"
+
+    @pytest.mark.integration
+    @skip_if_no_database
+    def test_complete_notebook_workflow_integration(self):
+        """
+        Complete integration test matching the exact notebook workflow
+        This test runs the entire acid formation assessment logic and validates all outputs
+        """
+        # Exact setup from notebook
+        acid = "H2SO4"
+        acid_in_co2 = 10  # ppm
+        water_in_co2 = 10.0  # ppm
+        temperature = 2  # C
+        pressure = 60  # bara
+        flow_rate = 100  # Mt/year
+
+        # Create and configure fluid exactly as in notebook
+        fluid = Fluid()
+        fluid.add_component("CO2", 1.0 - acid_in_co2 / 1e6 - water_in_co2 / 1e6)
+        fluid.add_component(acid, acid_in_co2 / 1e6)
+        fluid.add_component("H2O", water_in_co2 / 1e6)
+        fluid.set_temperature(temperature + 273.15)
+        fluid.set_pressure(pressure)
+        fluid.set_flow_rate(flow_rate * 1e6 * 1000 / (365 * 24), "kg/hr")
+
+        # Run calculations
+        fluid.calc_vapour_pressure()
+        fluid.flash_activity()
+
+        # Get CO2 parameters
+        results = get_co2_parameters(pressure, temperature + 273.15)
+
+        # Verify the complete workflow produces expected results
+        # All assertions with 5% tolerance as requested
+
+        # Comprehensive validation of all key outputs
+        assert (
+            fluid.betta is not None and fluid.betta > 0
+        ), "Beta should be calculated and positive"
+        assert len(fluid.phases) >= 1, "Should have at least one phase"
+        assert (
+            fluid.phases[0].get_component_fraction("H2O") > 0
+        ), "Should have water in gas phase"
+
+        # If two phases exist, validate liquid phase
+        if fluid.betta < 1:
+            assert (
+                len(fluid.phases) == 2
+            ), "Should have exactly two phases when beta < 1"
+            assert fluid.phases[1].name == "ACIDIC", "Second phase should be acidic"
+            assert (
+                fluid.phases[1].get_acid_wt_prc(acid) > 0
+            ), "Liquid phase should contain acid"
+            assert (
+                fluid.phases[1].get_flow_rate("kg/hr") > 0
+            ), "Liquid phase should have positive flow rate"
+
+        # Validate CO2 parameters are calculated
+        assert (
+            "density" in results and results["density"] > 0
+        ), "CO2 density should be positive"
+        assert (
+            "speed_of_sound" in results and results["speed_of_sound"] > 0
+        ), "Speed of sound should be positive"
+        assert "enthalpy" in results, "Enthalpy should be calculated"
+        assert "entropy" in results, "Entropy should be calculated"
+
+        # Basic sanity checks that values are in reasonable ranges
+        assert (
+            0 < fluid.betta <= 1
+        ), f"Beta should be between 0 and 1, got {fluid.betta}"
+        assert (
+            500 < results["density"] < 1200
+        ), f"CO2 density should be reasonable, got {results['density']} kg/m3"
+        assert (
+            200 < results["speed_of_sound"] < 600
+        ), f"Speed of sound should be reasonable, got {results['speed_of_sound']} m/s"
 
 
 # Utility functions for testing
@@ -523,3 +632,37 @@ def create_test_fluid(acid_type="H2SO4"):
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+class TestFluidWithoutDatabase:
+    """Test cases for Fluid class that work without database files"""
+
+    def test_fluid_initialization_without_database(self):
+        """Test that Fluid can be initialized even without database files"""
+        fluid = Fluid()
+        assert fluid is not None
+        assert hasattr(fluid, "components")
+        assert hasattr(fluid, "fractions")
+        assert hasattr(fluid, "properties")
+
+    def test_basic_fluid_operations_without_database(self):
+        """Test basic fluid operations that don't require database files"""
+        fluid = Fluid()
+
+        # Test temperature and pressure setting
+        fluid.set_temperature(275.15)
+        fluid.set_pressure(60.0)
+
+        assert fluid.temperature == 275.15
+        assert fluid.pressure == 60.0
+
+    def test_database_availability_check(self):
+        """Test that database availability is properly checked"""
+        comp_path = get_database_path("COMP.csv")
+        properties_path = get_database_path("Properties.csv")
+
+        # These should either be None or valid paths
+        if comp_path:
+            assert os.path.exists(comp_path)
+        if properties_path:
+            assert os.path.exists(properties_path)

@@ -1,0 +1,27 @@
+row_index,error,simulation_successful,experimental_betta,simulated_betta,betta_validation,simulated_pressure,simulated_temperature,composition,Gas.H2O,Gas.HNO3,Liq.H2O,Liq.HNO3,Liq.H2SO4
+0,None,True,double phase,0.9903002247465338,VALID,260.0,353.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+1,None,True,double phase,0.9897325861293211,VALID,140.0,353.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+2,None,True,double phase,0.9952965076317923,VALID,40.0,353.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",INVALID,,,,
+3,None,True,double phase,0.968805589227486,VALID,260.0,323.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+4,None,True,double phase,0.9812638469611557,VALID,140.0,323.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",INVALID,,,,
+5,None,True,double phase,0.984177591117259,VALID,40.0,323.15,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",INVALID,,,,
+6,None,True,double phase,0.9865988470173761,VALID,40.0,333.2,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+7,None,True,double phase,0.9846870294441032,VALID,80.0,333.2,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+8,None,True,double phase,0.9854187347900734,VALID,140.0,333.2,"{'H2O': 0.02, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.98}",VALID,,,,
+9,None,True,single phase,1.0,VALID,1.0,358.15,"{'H2O': 0.0, 'H2SO4': 0.0, 'HNO3': 0.01, 'CO2': 0.99}",,,,,
+10,None,True,double phase,1.0,INVALID,1.0,354.15,"{'H2O': 0.0, 'H2SO4': 0.0, 'HNO3': 0.01, 'CO2': 0.99}",,,,,
+11,None,True,single phase,1.0,VALID,1.0,555.15,"{'H2O': 0.0, 'H2SO4': 0.01, 'HNO3': 0.0, 'CO2': 0.99}",,,,,
+12,None,True,double phase,1.0,INVALID,1.0,551.15,"{'H2O': 0.0, 'H2SO4': 0.01, 'HNO3': 0.0, 'CO2': 0.99}",,,,,
+13,None,True,single phase,1.0,VALID,1.0,375.0,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.99}",,,,,
+14,None,True,double phase,1.0,INVALID,1.0,371.0,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0, 'CO2': 0.99}",,,,,
+15,None,True,double phase,0.974731362568491,VALID,98.6,297.15,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,VALID,VALID,
+16,None,True,double phase,0.9837616271524894,VALID,81.3,326.25,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,VALID,VALID,
+17,None,True,double phase,0.9840190098057064,VALID,101.3,326.25,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,VALID,VALID,
+18,None,True,double phase,0.9838893895230285,VALID,99.3,321.04999999999995,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,VALID,VALID,
+19,None,True,double phase,0.9820920668917097,VALID,119.2,321.34999999999997,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,VALID,VALID,
+20,None,True,double phase,0.007800000001225271,VALID,169.1,48.1,"{'H2O': 0.01, 'H2SO4': 0.0, 'HNO3': 0.0078, 'CO2': 0.9822}",,INVALID,INVALID,INVALID,
+21,None,True,double phase,0.9510960453317239,VALID,94.6,262.15,"{'H2O': 0.0013, 'H2SO4': 0.012, 'HNO3': 0.0, 'CO2': 0.9867}",,COMPONENT_NOT_FOUND,VALID,,VALID
+22,None,True,double phase,0.9867009378958755,VALID,77.9,319.65,"{'H2O': 0.0013, 'H2SO4': 0.012, 'HNO3': 0.0, 'CO2': 0.9867}",,COMPONENT_NOT_FOUND,VALID,,VALID
+23,None,True,double phase,0.9867020945730474,VALID,98.4,320.34999999999997,"{'H2O': 0.0013, 'H2SO4': 0.012, 'HNO3': 0.0, 'CO2': 0.9867}",,COMPONENT_NOT_FOUND,VALID,,VALID
+24,None,True,double phase,0.9847513189215533,VALID,118.6,321.04999999999995,"{'H2O': 0.0013, 'H2SO4': 0.012, 'HNO3': 0.0, 'CO2': 0.9867}",,COMPONENT_NOT_FOUND,VALID,,VALID
+25,None,True,double phase,0.9785242996313173,VALID,168.7,321.54999999999995,"{'H2O': 0.0013, 'H2SO4': 0.012, 'HNO3': 0.0, 'CO2': 0.9867}",,COMPONENT_NOT_FOUND,VALID,,VALID
