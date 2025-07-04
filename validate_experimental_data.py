@@ -21,20 +21,18 @@ def read_experimental_data():
 
     # Read all sheets to understand the structure
     excel_file = pd.ExcelFile(file_path)
-    print("Available sheets:", excel_file.sheet_names)
+    logger.info("Available sheets: %s", excel_file.sheet_names)
 
     # Read the first sheet (assuming it contains the main data)
     df = pd.read_excel(file_path, sheet_name=0)
 
-    print("\nDataFrame shape:", df.shape)
-    print("\nColumn names:")
-    print(df.columns.tolist())
+    logger.info("DataFrame shape: %s", df.shape)
+    logger.info("Column names: %s", df.columns.tolist())
 
-    print("\nFirst few rows:")
-    print(df.head())
+    logger.debug("First few rows: %s", df.head())
 
-    print("\nDataFrame info:")
-    print(df.info())
+    logger.debug("DataFrame info:")
+    df.info(buf=None)  # Log DataFrame info directly
 
     return df
 
