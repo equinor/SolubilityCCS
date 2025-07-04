@@ -5,11 +5,16 @@ Validation script for experimental data from solubilityExperimentalData.xlsx.
 Reads composition data and validates simulation results against experimental data.
 """
 
+import logging
 import os
 
 import pandas as pd
 
 from solubilityccs import Fluid
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def read_experimental_data():
