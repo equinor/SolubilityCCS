@@ -163,6 +163,14 @@ class Phase:
         else:
             self.name = "ACIDIC"
 
+    def set_component_fraction(self, component, fraction):
+        """Set the fraction of a specific component in the phase."""
+        if component in self.components:
+            index = self.components.index(component)
+            self.fractions[index] = fraction
+        else:
+            raise ValueError(f"Component {component} not found in phase.")
+
 
 class Fluid:
 
@@ -469,7 +477,40 @@ class Fluid:
         for i, component in enumerate(self.components):
             self.fugacity.append(self.fug_coeff[i] * self.pressure * fractions[i])
 
+    def get_component_fraction(self, component):
+        """Get the fraction of a specific component in the fluid."""
+        if component in self.components:
+            index = self.components.index(component)
+            return self.fractions[index]
+        else:
+            raise ValueError(f"Component {component} not found in fluid.")
+
+    def set_component_fraction(self, component, fraction):
+        """Set the fraction of a specific component in the fluid."""
+        if component in self.components:
+            index = self.components.index(component)
+            self.fractions[index] = fraction
+        else:
+            raise ValueError(f"Component {component} not found in fluid.")
+
+    def validate_composition(self):
+        if "H2O" not in self.components:
+            self.add_component("H2O", 1e-30)
+
+        if self.get_component_fraction("H2O") < 1e-30:
+            self.set_component_fraction("H2O", 1e-30)
+
+        if "H2SO4" not in self.components and "HNO3" not in self.components:
+            self.add_component("HNO3", 1e-30)
+
+        if "H2SO4" in self.components and self.get_component_fraction("H2SO4") < 1e-30:
+            self.set_component_fraction("H2SO4", 1e-30)
+
+        if "HNO3" in self.components and self.get_component_fraction("HNO3") < 1e-30:
+            self.set_component_fraction("HNO3", 1e-30)
+
     def flash_activity(self):
+        self.validate_composition()
         self.calc_vapour_pressure()
         self.normalize()
         self.K_values = [1e50, 0.005, 0.005]
@@ -484,8 +525,7 @@ class Fluid:
             self.calc_phases()
             for i in range(len(self.phases)):
                 self.phases[i].set_phase_flow_rate(self.flow_rate)
-
-            self.get_phase(1).fractions[0] = 1e-50
+            self.get_phase(1).set_component_fraction("CO2", 1e-50)
             self.get_phase(1).normalize()
             self.calc_fugacity_neqsim_CPA(self.phases[0].fractions)
             self.calc_activity()
@@ -507,7 +547,7 @@ class Fluid:
                 ]
                 self.solve_Rachford_Rice()
                 self.calc_phases()
-                self.get_phase(1).fractions[0] = 1e-50
+                self.get_phase(1).set_component_fraction("CO2", 1e-50)
                 self.get_phase(1).normalize()
                 self.calc_fugacity_neqsim_CPA(self.phases[0].fractions)
                 self.calc_activity()
