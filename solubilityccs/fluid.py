@@ -614,9 +614,8 @@ class ModelResults:
         lines.append("")
         lines.append("📋 SYSTEM OVERVIEW")
         lines.append("─" * 35)
-        lines.append(f"Acid Type:            {acid}")
-        lines.append(f"Temperature:          {self.fluid.temperature - 273.15:.1f} °C")
-        lines.append(f"Pressure:             {self.fluid.pressure:.1f} bara")
+        lines.append(f"Temperature:          {self.fluid.temperature - 273.15:.2f} °C")
+        lines.append(f"Pressure:             {self.fluid.pressure:.2f} bara")
 
         # Phase Behavior Assessment
         lines.append("")
@@ -630,9 +629,17 @@ class ModelResults:
             lines.append("✅ STATUS: Single gas phase - No acid formation risk")
             lines.append("🟢 RISK LEVEL: Safe operation")
 
-        # Gas Phase Composition
+        # Gas Phase Composition (or Liquid CO2 if high density)
         lines.append("")
-        lines.append("GAS PHASE COMPOSITION")
+
+        # Check CO2 density to determine if it's liquid CO2
+        co2_density = (
+            self.co2_properties.get("density", 0) if self.co2_properties else 0
+        )
+        if isinstance(co2_density, (int, float)) and co2_density > 300:
+            lines.append("LIQUID CO2 PHASE COMPOSITION")
+        else:
+            lines.append("GAS PHASE COMPOSITION")
         lines.append("─" * 35)
 
         if len(self.fluid.phases) > 0:
@@ -655,21 +662,21 @@ class ModelResults:
             liquid_phase = self.fluid.phases[1]
             lines.append(f"Phase Type:           {liquid_phase.name}")
             lines.append(
-                f"Acid Concentration:   {liquid_phase.get_acid_wt_prc(acid):.3f} wt%"
+                f"Acid Concentration:   {liquid_phase.get_acid_wt_prc(acid):.2f} wt%"
             )
 
             # Flow rate calculations (if available)
             try:
                 flow_rate_ty = liquid_phase.get_flow_rate("kg/hr") * 24 * 365 / 1000
-                lines.append(f"Liquid Flow Rate:     {flow_rate_ty:.6f} t/year")
+                lines.append(f"Liquid Flow Rate:     {flow_rate_ty:.2f} t/year")
             except (ValueError, AttributeError):
                 lines.append("Liquid Flow Rate:     Not available")
 
             h2o_mol_frac = liquid_phase.get_component_fraction("H2O")
             acid_mol_frac = liquid_phase.get_component_fraction(acid)
 
-            lines.append(f"Water Mol Fraction: {h2o_mol_frac:.6f}")
-            lines.append(f"{acid} Mol Fraction: {acid_mol_frac:.6f}")
+            lines.append(f"Water Mol Fraction: {h2o_mol_frac:.2f}")
+            lines.append(f"{acid} Mol Fraction: {acid_mol_frac:.2f}")
 
         # Pure CO2 Properties
         if include_co2_props and self.co2_properties:
@@ -677,22 +684,34 @@ class ModelResults:
             lines.append("PURE CO₂ PROPERTIES")
             lines.append("─" * 35)
 
-            lines.append(
-                f"Density:              "
-                f"{self.co2_properties.get('density', 'N/A')} kg/m³"
-            )
-            lines.append(
-                f"Speed of Sound:       "
-                f"{self.co2_properties.get('speed_of_sound', 'N/A')} m/s"
-            )
-            lines.append(
-                f"Enthalpy:             "
-                f"{self.co2_properties.get('enthalpy', 'N/A')} kJ/kg"
-            )
-            lines.append(
-                f"Entropy:              "
-                f"{self.co2_properties.get('entropy', 'N/A')} J/K"
-            )
+            density = self.co2_properties.get("density", "N/A")
+            speed_of_sound = self.co2_properties.get("speed_of_sound", "N/A")
+            enthalpy = self.co2_properties.get("enthalpy", "N/A")
+            entropy = self.co2_properties.get("entropy", "N/A")
+
+            # Format density
+            if isinstance(density, (int, float)):
+                lines.append(f"Density:              {density:.2f} kg/m³")
+            else:
+                lines.append(f"Density:              {density} kg/m³")
+
+            # Format speed of sound
+            if isinstance(speed_of_sound, (int, float)):
+                lines.append(f"Speed of Sound:       {speed_of_sound:.2f} m/s")
+            else:
+                lines.append(f"Speed of Sound:       {speed_of_sound} m/s")
+
+            # Format enthalpy
+            if isinstance(enthalpy, (int, float)):
+                lines.append(f"Enthalpy:             {enthalpy:.2f} kJ/kg")
+            else:
+                lines.append(f"Enthalpy:             {enthalpy} kJ/kg")
+
+            # Format entropy
+            if isinstance(entropy, (int, float)):
+                lines.append(f"Entropy:              {entropy:.2f} J/K")
+            else:
+                lines.append(f"Entropy:              {entropy} J/K")
 
         # Footer
         lines.append("")
