@@ -563,6 +563,44 @@ class Fluid:
     def get_phase(self, i):
         return self.phases[i]
 
+    def init(self):
+        # self.validate_composition()
+        self.calc_vapour_pressure()
+        # self.normalize()
+        self.K_values = [1e50, 0.005, 0.005]
+        self.calc_fugacicy_coefficient_neqsim_CPA()
+        self.calc_activity()
+
+    def get_component_activity(self, component):
+        if component in self.components:
+            index = self.components.index(component)
+            return self.activity[index]
+        else:
+            raise ValueError(f"Component {component} not found in fluid.")
+
+    def get_acid_solubility(self, acid, concentration):
+
+        self.add_component("CO2", 1)
+        self.add_component("H2O", 1)
+        self.add_component("H2SO4", 1)
+
+        components = ["CO2", "H2O", acid]
+        yi = [1, 300 * 1e-6, 10 * 1e-6]
+        xi = [0, 1 - concentration, concentration]
+        self.components = components
+        self.get_phase(0).set_phase(components, yi, 0.5, "gas")
+        self.get_phase(1).set_phase(components, xi, 0.5, "liquid")
+        self.calc_vapour_pressure()
+        self.calc_fugacicy_coefficient_neqsim_CPA()
+        self.init()
+        solubility_ppm = (
+            1e6
+            * self.get_component_activity(acid)
+            / (self.fug_coeff[self.components.index(acid)] * self.pressure)
+        )
+
+        return solubility_ppm
+
 
 class ModelResults:
     """Class to format and display modeling results as a clean table string."""
