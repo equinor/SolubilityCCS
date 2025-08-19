@@ -3,6 +3,6 @@ include LICENSE
 include pyproject.toml
 include requirements.txt
 include requirements-dev.txt
-recursive-include solubilityccs/Database *.csv
+recursive-include solubilityccs/Database *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
