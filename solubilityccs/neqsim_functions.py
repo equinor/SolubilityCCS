@@ -38,8 +38,25 @@ def get_component_list(fluid):
 def get_gas_fug_coef(fluid1):
     fug = []
     components_list = get_component_list(fluid1)
+
+    # Find the phase with highest amount of CO2
+    co2_phase_index = 0
+    max_co2_fraction = 0.0
+
+    # Check if CO2 exists in the fluid and find phase with highest CO2 content
+    if "CO2" in components_list and fluid1.getNumberOfPhases() > 1:
+        for phase_idx in range(fluid1.getNumberOfPhases()):
+            co2_fraction = fluid1.getPhase(phase_idx).getComponent("CO2").getx()
+            if co2_fraction > max_co2_fraction:
+                max_co2_fraction = co2_fraction
+                co2_phase_index = phase_idx
+
     for component in components_list:
-        fug.append(fluid1.getPhase(0).getComponent(component).getFugacityCoefficient())
+        fug.append(
+            fluid1.getPhase(co2_phase_index)
+            .getComponent(component)
+            .getFugacityCoefficient()
+        )
     return fug
 
 
