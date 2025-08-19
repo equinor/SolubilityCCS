@@ -73,7 +73,7 @@ where = ["."]
 include = ["solubilityccs*"]
 
 [tool.setuptools.package-data]
-solubilityccs = ["Database/*.csv"]
+solubilityccs = ["Database/*"]
 
 [tool.black]
 line-length = 88
