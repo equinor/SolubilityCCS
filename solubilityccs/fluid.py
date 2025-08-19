@@ -582,7 +582,7 @@ class Fluid:
 
         self.add_component("CO2", 1)
         self.add_component("H2O", 1)
-        self.add_component("H2SO4", 1)
+        self.add_component(acid, 1)
 
         components = ["CO2", "H2O", acid]
         yi = [1, 300 * 1e-6, 10 * 1e-6]
